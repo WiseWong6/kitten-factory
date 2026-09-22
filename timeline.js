@@ -108,6 +108,7 @@
   const primary = recipe => ['bicolor', 'xiaokui', 'orangewhite'].includes(recipe.kind) ? recipe.ink : recipe.base;
   const secondary = recipe => ['bicolor', 'xiaokui', 'orangewhite'].includes(recipe.kind) ? '#FFFFFF' : recipe.kind === 'solid' ? '#F9CD77' : recipe.kind === 'gray' ? recipe.eye : recipe.ink;
   function beanColors(recipe) {
+    if (recipe.beanColors && recipe.beanColors.length) return recipe.beanColors;
     if (['solid', 'gray', 'white'].includes(recipe.kind)) return [recipe.base];
     if (['calico', 'bengal'].includes(recipe.kind)) return [recipe.base, recipe.accent, recipe.ink];
     if (['bicolor', 'xiaokui', 'orangewhite'].includes(recipe.kind)) return [recipe.ink, recipe.base];

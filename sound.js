@@ -35,8 +35,8 @@
       if (voice) add('meow', voice.clip, voice.start, voice.duration, voice.gain, voice.pitch);
     }
     // One recorded scatter for each batch, timed to the first bean landing.
-    if (round === 0) add('bean', 'beans', .68, .42, .18);
-    add('bean', 'beans', 5.88, .42, .18);
+    if (!timeline.manualBeans && round === 0) add('bean', 'beans', .68, .42, .18);
+    if (!timeline.manualBeans) add('bean', 'beans', 5.88, .42, .18);
     add('land', 'land', 7.27, .18, .18);
     return cues;
   }

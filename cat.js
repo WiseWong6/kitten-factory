@@ -485,6 +485,7 @@
     });
   }
   function coat(ctx, m, recipe) {
+    if (recipe.custom && root.FactoryCustomCoat) { root.FactoryCustomCoat(ctx, m, recipe); return; }
     const kind = recipe.kind === 'orangewhite' ? 'bicolor' : recipe.kind, ink = recipe.ink;
     if (kind === 'xiaokui') { xiaokuiCoat(ctx, m, ink); return; }
     if (kind === 'bengal') { bengalCoat(ctx, m, recipe); return; }
@@ -658,14 +659,14 @@
       const p = localPoint(x, y);
       const threshold = staged ? Math.hypot((p[0] - 90) / 330, (p[1] + 88) / 240) : Math.hypot(p[0] / 220, (p[1] + 80) / 195);
       const dark = (pointOrBlack || state.recipe.kind === 'gray') && amount >= threshold;
-      const color = dark ? coloredEye : NAVY;
+      const color = state.recipe.custom && amount >= threshold ? state.recipe.eye : (dark ? coloredEye : NAVY);
       if (blink) stroke(ctx, local([['M', x - rx, y], ['Q', x, y + 4, x + rx, y]]), color, 1.4);
       else refEllipse(ctx, x, y, rx, ry, color);
     }
     const nosePoint = localPoint(611, 176);
     const muzzleThreshold = staged ? Math.hypot((nosePoint[0] - 90) / 330, (nosePoint[1] + 88) / 240) : Math.hypot(nosePoint[0] / 220, (nosePoint[1] + 80) / 195);
     const darkMuzzle = pointOrBlack && amount > muzzleThreshold;
-    const faceColor = darkMuzzle ? '#CBC7C5' : NAVY;
+    const faceColor = state.recipe.custom && amount > muzzleThreshold ? state.recipe.faceInk : (darkMuzzle ? '#CBC7C5' : NAVY);
     refFill(ctx, [['M', 602, 170], ['Q', 612, 166, 620, 170], ['C', 627, 175, 616, 184, 612, 186], ['C', 606, 185, 594, 175, 602, 170], ['Z']], faceColor);
     const mouthColor = amount === 1 && ['tabby', 'gold', 'goldtabby'].includes(state.recipe.kind) ? '#714951' : faceColor;
     const meow = m.reaction.meow;

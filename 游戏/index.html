@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0E3CF1">
+  <title>小猫加工厂 · 调一只你的猫</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="game-shell">
+    <section id="factory" aria-label="小猫加工厂">
+      <canvas id="factory-art" width="900" height="1200" aria-label="咖啡机与等待加工的白猫"></canvas>
+      <header class="game-header">
+        <div><span class="eyebrow">一杯颜色，一只小猫</span><h1>小猫加工厂</h1></div>
+        <button id="collection-open" class="collection-button" aria-label="打开猫饼收藏夹">
+          <svg viewBox="0 0 44 44" aria-hidden="true"><path d="M8 19 8 8Q8 5 11 7L19 13Q24 11 29 13L36 7Q38 6 38 10L37 23Q41 37 26 39L18 39Q4 36 8 19Z" fill="currentColor"/><ellipse cx="19" cy="25" rx="2" ry="3" fill="#172356"/><ellipse cx="30" cy="24" rx="1.7" ry="2.7" fill="#172356"/><path d="m23 30 3 0-1.5 2Z" fill="#172356"/></svg>
+          <span id="collection-count">0</span>
+        </button>
+      </header>
+      <section id="mix-panel" class="mix-panel" aria-label="豆子色盘">
+        <div class="mix-heading"><span id="mix-label">选 1–3 种颜色，调一只猫</span><strong id="bean-count">0 / 12</strong></div>
+        <div id="palette" class="palette"></div>
+        <div class="mix-actions"><button id="undo" class="quiet">撤回</button><button id="clear" class="quiet">清空</button><button id="start" class="primary" disabled>加满 12 颗，开始做猫</button></div>
+        <button id="try-recipe" class="recipe-tip">试试三花：白 6 · 橘 3 · 黑 3 ↗</button>
+      </section>
+      <section id="making-panel" class="making-panel" hidden>
+        <span class="eyebrow">你的这一杯</span><h2 id="making-status">正在磨豆</h2>
+        <div id="batch-colors" class="batch-colors"></div>
+        <button id="result-open" class="primary" hidden>查看猫卡</button>
+        <button id="next-batch" class="quiet" hidden>再做一只</button>
+      </section>
+    </section>
+    <div id="game-controls" class="playback" role="group" aria-label="制作过程播放控制">
+      <button id="pause" disabled>暂停</button><input id="progress" type="range" min="0" max="8" step="0.01" value="0" aria-label="制作进度" disabled>
+      <button id="replay" disabled>重播</button><button id="speed">1×</button><button id="audio" aria-pressed="false">声音关</button><output id="clock">00:00 / 00:08</output>
+    </div>
+  </main>
+  <section id="collection" class="overlay" role="dialog" aria-modal="true" aria-labelledby="collection-title" hidden>
+    <div class="collection-sheet"><header><div><span class="eyebrow">每一只，都是你调出来的</span><h2 id="collection-title">猫饼收藏夹</h2></div><button id="collection-close" class="close" aria-label="关闭收藏夹">×</button></header>
+      <p id="collection-summary"></p><div id="puck-grid" class="puck-grid"></div><p id="empty-collection">还没有猫饼。<br>调好第一杯颜色，就能带一只回家。</p>
+      <nav class="page-nav" aria-label="收藏翻页"><button id="prev-page" class="quiet">上一页</button><span id="page-label">1 / 1</span><button id="next-page" class="quiet">下一页</button></nav>
+      <button id="retry-storage" class="quiet" hidden>重试保存收藏</button>
+      <p id="storage-note" class="storage-note">收藏保存在当前设备，喜欢的猫卡记得保存。</p>
+    </div>
+  </section>
+  <section id="card-modal" class="overlay card-overlay" role="dialog" aria-modal="true" aria-labelledby="card-heading" hidden>
+    <div class="card-sheet"><div class="card-top"><h2 id="card-heading">你的新朋友</h2><button id="card-close" class="close" aria-label="关闭猫卡">×</button></div>
+      <canvas id="cat-card" width="900" height="1200" aria-label="猫咪收藏卡"></canvas>
+      <div class="card-actions"><button id="save-card" class="primary">保存猫卡</button><button id="card-next" class="secondary">再做一只</button></div>
+      <p id="save-status" aria-live="polite"></p>
+    </div>
+  </section>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <img id="coffee-bean-art" src="../assets/coffee-bean.png" alt="" hidden>
+  <script src="../timeline.js"></script><script src="rules.js"></script><script src="custom-art.js"></script><script src="../cat.js"></script>
+  <script src="../assets/audio/clips.js"></script><script src="../sound.js"></script><script src="../scene.js"></script>
+  <script src="storage.js"></script><script src="game.js"></script>
+</body>
+</html>
