@@ -102,9 +102,11 @@
   $('audio').addEventListener('click',async()=>{
     if(game.modal)return;
     $('audio').disabled=true;
-    const enabled=await gameAudio.setEnabled(!gameAudio.enabled);
+    const requested=!gameAudio.enabled;
+    const enabled=await gameAudio.setEnabled(requested);
     $('audio').textContent=enabled?'声音开':'声音关';$('audio').setAttribute('aria-pressed',String(enabled));$('audio').disabled=false;
-    if(!enabled)say('声音已关闭或当前环境暂不可播放');wake();
+    $('audio').setAttribute('aria-label',enabled?'关闭游戏音效':'开启游戏音效');
+    if(requested&&!enabled)say('声音暂未开启，请再点一次');wake();
   });
   function dragStart(){if(game.modal||!game.batch||dragging)return;dragging=true;wasPlaying=game.playing;game.playing=false;gameAudio.reset();}
   function dragEnd(){if(!dragging)return;dragging=false;game.playing=wasPlaying&&game.mode!=='done';last=performance.now();updateUI();wake();}

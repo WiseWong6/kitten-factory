@@ -18,6 +18,7 @@
           <span id="collection-count">0</span>
         </button>
       </header>
+      <button id="audio" class="game-audio" aria-pressed="false" aria-label="开启游戏音效">声音关</button>
       <section id="mix-panel" class="mix-panel" aria-label="豆子色盘">
         <div class="mix-heading"><span id="mix-label">选颜色，拖动配色条调比例</span><strong id="bean-count">0 种颜色</strong></div>
         <div id="palette" class="palette"></div>
@@ -51,9 +52,9 @@
     </div>
   </section>
     </section></div>
-    <div id="game-controls" class="playback" role="group" aria-label="制作过程播放控制">
+    <div id="game-controls" class="playback" hidden role="group" aria-label="制作过程播放控制">
       <button id="pause" disabled>暂停</button><input id="progress" type="range" min="0" max="8" step="0.01" value="0" aria-label="制作进度" disabled>
-      <button id="replay" disabled>重播</button><button id="speed">1×</button><button id="audio" aria-pressed="false">声音关</button><output id="clock">00:00 / 00:08</output>
+      <button id="replay" disabled>重播</button><button id="speed">1×</button><output id="clock">00:00 / 00:08</output>
     </div>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>

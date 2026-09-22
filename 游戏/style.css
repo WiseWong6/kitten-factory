@@ -30,3 +30,6 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh;min
 #factory .card-sheet{width:340px;max-width:100%;max-height:100%;overflow:auto}
 #factory .card-actions button{min-width:0}
 #collection-open{transform:scale(var(--receive-scale,1));box-shadow:0 0 0 var(--receive-ring,0px) #fff3df30;transition:none}
+
+/* Game sound remains inside the 3:4 frame, below the collection button. */
+.game-audio{position:absolute;top:74px;right:25px;width:48px;min-height:32px;padding:6px 0;border-radius:10px;background:#172356;color:#FFF3DF;font-size:11px}
