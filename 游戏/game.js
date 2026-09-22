@@ -6,7 +6,7 @@
   const game={mix:[],history:[],beans:[],added:[],mode:'mix',time:0,playing:false,rate:1,batch:null,awarded:false,
     records:[],page:0,modal:null,card:null,cardFrom:null,restorePlay:false,ready:false,persistent:true,saving:false};
   const white=F.recipes.find(r=>r.kind==='white');
-  const audioTimeline={recipes:[white],mod:F.mod,voiceFor:r=>F.voiceFor(r.custom?{kind:'bicolor'}:r),xiaokuiVoice:F.xiaokuiVoice,manualBeans:true,collectAt:M.arrival};
+  const audioTimeline={recipes:[white],mod:F.mod,voiceFor:r=>F.voiceFor(r.custom?{kind:r.voiceKind||'bicolor'}:r),xiaokuiVoice:F.xiaokuiVoice,manualBeans:true,collectAt:M.arrival};
   const gameAudio=FactorySound.create(audioTimeline);
   let last=performance.now(), now=last, frame=null, toastTimer, lastFocus=null,dragging=false,wasPlaying=false;
   coffeeBeanArt=$('coffee-bean-art');ctx=paint;
@@ -133,7 +133,10 @@
     if(p<5.8)s.handle=F.handlePose(p,false);
     else s.handle=M.at(p).handle;
     const cat=F.catState(index*8+p,index);cat.recipe=recipe;
-    if(recipe.custom)cat.reaction=F.catState(8*8+p,8).reaction;
+    if(recipe.custom){
+      const voiceIndex=F.recipes.findIndex(r=>r.kind===(recipe.voiceKind||'bicolor'));
+      cat.reaction=F.catState(voiceIndex*8+p,voiceIndex).reaction;
+    }
     s.cats=[cat];
     const collection=M.at(p);s.receive=collection.receive;
     if(collection.puck)s.pucks=[Object.assign({recipe},collection.puck)];

@@ -19,6 +19,21 @@ check('自创猫随机结果冻结、配色来自输入且同次重画不变',()
  assert.ok(new Set(results).size>=8);
  const r=R.make(customBeans,42,F.recipes,1000);assert.deepEqual(JSON.parse(JSON.stringify(r)),r);
 });
+check('随机猫叫排除小葵和白猫，固定种子重建及口型时段一致',()=>{
+ const clips=new Set();
+ for(let seed=1;seed<=120;seed++){
+  const r=R.make(customBeans,(seed*2654435761)>>>0,F.recipes,1000);
+  const kind=r.recipe.voiceKind,voice=F.voiceFor({kind});
+  assert.ok(['bicolor','silver','ginger','gray'].includes(kind));
+  assert.ok(voice&&!['angry','meow-white'].includes(voice.clip));clips.add(voice.clip);
+  assert.equal(R.make(r.beans,r.seed,F.recipes,r.createdAt,r.recipeVersion).recipe.voiceKind,kind);
+  const index=F.recipes.findIndex(cat=>cat.kind===kind);
+  assert.ok(index>=0);
+  assert.ok(F.catState(index*8+voice.start+.2,index).reaction.meow>0);
+  assert.equal(F.catState(index*8+voice.start+voice.duration+.05,index).reaction.meow,0);
+ }
+ assert.equal(clips.size,4);
+});
 check('已有猫累计次数，自创猫分别保存',()=>{
  const a=R.make(flatten(R.formulas[0]),1,F.recipes,1000),b=R.make(customBeans,2,F.recipes,1000),c=R.make(customBeans,3,F.recipes,1000);
  let list=R.collect([],a);list=R.collect(list,a);list=R.collect(list,b);list=R.collect(list,c);assert.equal(list.length,3);assert.equal(list[0].count,2);

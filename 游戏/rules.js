@@ -69,6 +69,7 @@
         eye:(light(primary)<120?['#F9CD77','#B5D6F5','#FFF3DF']:['#172356','#46365C','#354955'])[Math.floor(rng()*3)],
         faceInk:light(mask==='blaze'?accent:primary)<120?'#FFF3DF':'#172356',
         innerEar:mix(accent,'#D9979C',.28),pattern,mask,socks:rng()>.4,tailBands:rng()>.45,spotData};
+      recipe.voiceKind=['bicolor','silver','ginger','gray'][Math.floor(rng()*4)];
       id='custom-'+(now||Date.now()).toString(36)+'-'+(seed>>>0).toString(36);
     }
     recipe.beanColors=visualBeans(beans).map(id=>palette.find(p=>p.id===id).hex);
