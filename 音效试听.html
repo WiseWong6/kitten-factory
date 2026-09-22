@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>小猫加工厂 · 音效试听</title>
+  <style>
+    :root{color-scheme:dark;font-family:system-ui,sans-serif;background:#0e3cf1;color:white}
+    body{max-width:760px;margin:0 auto;padding:40px 24px 60px}h1{font-size:26px;margin:0 0 12px}
+    p{line-height:1.7;color:#d9e2ff}a{color:white}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:24px 0 36px}
+    article{background:#172356;padding:20px;border-radius:18px}h2{font-size:20px;margin:28px 0 12px}h3{font-size:16px;margin:0 0 16px}article p{font-size:13px}audio{display:block;width:100%}
+    @media(max-width:560px){.grid{grid-template-columns:1fr}body{padding:28px 18px}}
+  </style>
+</head>
+<body>
+  <h1>小猫加工厂 · 音效试听</h1>
+  <p>白猫单独用委屈的轻叫，小葵换成凶一点的真猫叫声。下面这两段已接入动画，试听音量与速度和对应角色一致。播放下一段会暂停上一段。</p>
+  <main>
+    <section class="grid" aria-label="白猫与小葵的新叫声">
+      <article><h3>纯白 · 委屈轻叫</h3><audio aria-label="白猫委屈轻叫" controls preload="none" src="assets/audio/clips/meow-white.wav" data-gain="0.43" data-pitch="0.98"></audio><p><a href="https://freesound.org/people/F.M.Audio/sounds/583390/">Sad Cat Vocalisation 1.wav — F.M.Audio</a>，<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。取原录音 0.25–0.70 秒，调整峰值和起尾，尾部补静音。仅分配给纯白猫。</p><a href="index.html?cat=white">看白猫的加工过程</a></article>
+      <article><h3>小葵 · 怒叫</h3><audio aria-label="小葵真猫怒叫" controls preload="none" src="assets/audio/clips/angry.wav" data-gain="0.58"></audio><p><a href="https://freesound.org/people/InspectorJ/sounds/415209/">Cat, Screaming, A.wav — InspectorJ</a>（<a href="https://www.jshaw.co.uk/">www.jshaw.co.uk</a>），<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。取原录音 0.20–1.40 秒，调整峰值与起尾，保留原音调。</p><a href="index.html?cat=xiaokui">看小葵的加工过程</a></article>
+    </section>
+    <details>
+    <summary>此前的哈气候选（已不用于动画）</summary>
+    <section class="grid" aria-label="猫哈气候选">
+      <article><h3>候选一 · 家猫之间的哈气</h3><audio aria-label="候选一家猫哈气" controls preload="none" src="assets/audio/candidates/hiss-patchy.wav" data-gain="0.68"></audio><p>约 0.85 秒，保留短版完整起尾。<a href="https://freesound.org/people/AUDACITIER/sounds/634663/">AUDACITIER 的短版</a>，<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>；<a href="https://freesound.org/people/patchytherat/sounds/532225/">原录音 patchytherat</a>，CC0。已调整峰值、淡入淡出。</p></article>
+      <article><h3>候选二 · 家猫单次哈气</h3><audio aria-label="候选二家猫哈气" controls preload="none" src="assets/audio/candidates/hiss-aunrea.wav" data-gain="0.68"></audio><p>约 0.67 秒，保留完整录音。<a href="https://freesound.org/people/aunrea/sounds/485952/">aunrea 的家猫录音</a>，CC0；此前动画使用过它的短剪。</p></article>
+      <article><h3>候选三 · 对玩具哈气</h3><audio aria-label="候选三猫对玩具哈气" controls preload="none" src="assets/audio/candidates/hiss-lucy.wav" data-gain="0.68"></audio><p>3.40 秒的较长段落。<a href="https://freesound.org/people/egovind/sounds/725181/">egovind 录下的猫 Lucy</a>，CC0。取原录音 6.1–9.5 秒，仅供比较，尚未接入动画。</p></article>
+      <article><h3>历史版本 · 小葵哈气短剪</h3><audio aria-label="历史小葵哈气短剪" controls preload="none" src="assets/audio/clips/hiss.wav" data-gain="0.68"></audio><p>来自候选二，取 0.04–0.30 秒，尾部补静音。已经由上方怒叫替换。</p></article>
+    </section>
+    </details>
+    <h2>猫叫与机器</h2>
+    <p>四种真实猫叫保留原速。机器声音已调低，以下机器试听与动画使用相同音量。</p>
+    <section class="grid" aria-label="猫叫与机器音效">
+      <article><h3>猫叫一</h3><audio aria-label="猫叫一" controls preload="none" src="assets/audio/clips/meow.wav" data-gain="0.68"></audio></article>
+      <article><h3>猫叫二</h3><audio aria-label="猫叫二" controls preload="none" src="assets/audio/clips/meow-soft.wav" data-gain="0.68"></audio></article>
+      <article><h3>猫叫三</h3><audio aria-label="猫叫三" controls preload="none" src="assets/audio/clips/meow-bright.wav" data-gain="0.68"></audio></article>
+      <article><h3>猫叫四</h3><audio aria-label="猫叫四" controls preload="none" src="assets/audio/clips/meow-low.wav" data-gain="0.68"></audio></article>
+      <article><h3>磨豆</h3><audio aria-label="磨豆" controls preload="none" src="assets/audio/clips/grind.wav" data-gain="0.126"></audio></article>
+      <article><h3>萃取与液流</h3><audio aria-label="萃取与液流" controls preload="none" src="assets/audio/clips/brew.wav" data-gain="0.108"></audio></article>
+      <article><h3>蒸汽喷气</h3><audio aria-label="蒸汽喷气" controls preload="none" src="assets/audio/clips/steam.wav" data-gain="0.1035"></audio></article>
+      <article><h3>落豆</h3><audio aria-label="落豆" controls preload="none" src="assets/audio/clips/beans.wav" data-gain="0.081"></audio></article>
+      <article><h3>锁柄轻响</h3><audio aria-label="锁柄轻响" controls preload="none" src="assets/audio/clips/latch.wav" data-gain="0.099"></audio></article>
+      <article><h3>猫饼落下</h3><audio aria-label="猫饼落下" controls preload="none" src="assets/audio/clips/land.wav" data-gain="0.081"></audio></article>
+    </section>
+  </main>
+  <p><a href="index.html">返回小猫加工厂</a> · <a href="assets/audio/素材来源.md">素材来源与裁切记录</a></p>
+  <script>
+    const players = [...document.querySelectorAll('audio')];
+    for (const player of players) {
+      player.volume = Number(player.dataset.gain) * .72;
+      player.defaultPlaybackRate = player.playbackRate = Number(player.dataset.pitch || 1);
+      player.preservesPitch = false;
+      player.addEventListener('play', () => {
+        for (const other of players) if (other !== player) other.pause();
+      });
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) for (const player of players) player.pause();
+    });
+    window.addEventListener('pagehide', () => { for (const player of players) player.pause(); });
+  </script>
+</body>
+</html>

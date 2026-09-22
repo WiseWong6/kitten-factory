@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0E3CF1">
+  <title>小猫加工厂</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="stage" aria-label="小猫加工厂，空格暂停或继续，R 键重新播放"></main>
+  <div id="play-controls" class="playback" role="group" aria-label="动画播放控制">
+    <button id="play-toggle" type="button" disabled>暂停</button>
+    <input id="play-progress" type="range" min="0" max="120" step="0.05" value="0" aria-label="动画进度" disabled>
+    <button id="play-speed" type="button" aria-label="播放速度 1 倍，点击切换" title="切换倍速：0.5 / 1 / 1.5 / 2 / 3" disabled>1×</button>
+    <button id="play-sound" type="button" aria-pressed="false" aria-label="开启音效">音效关</button>
+    <output id="play-time" for="play-progress" aria-live="off">00:00 / 02:00</output>
+  </div>
+  <img id="coffee-bean-art" src="assets/coffee-bean.png" hidden alt="">
+  <noscript>请启用 JavaScript 观看小猫加工厂。</noscript>
+  <script src="vendor/p5.min.js"></script>
+  <script src="timeline.js"></script>
+  <script src="cat.js"></script>
+  <script src="assets/audio/clips.js"></script>
+  <script src="sound.js"></script>
+  <script src="scene.js"></script>
+</body>
+</html>

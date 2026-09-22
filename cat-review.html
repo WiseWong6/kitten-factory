@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小猫形态检查</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b1023;color:#fff;font-family:system-ui,sans-serif}main{max-width:980px;margin:auto;padding:28px 22px}h1{font-size:22px;font-weight:600;margin:0 0 10px}p{color:#bbc5df;font-size:14px;line-height:1.7;margin:8px 0 18px}nav{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}button,a{font:inherit;font-size:14px;border:1px solid #394564;border-radius:8px;padding:9px 13px;color:#d6def2;background:transparent;text-decoration:none;cursor:pointer}button[aria-pressed="true"]{background:#fff;color:#172356;border-color:#fff}canvas{display:block;width:100%;height:auto;background:#0e3cf1;border-radius:2px}footer{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}.legend{display:flex;justify-content:space-around;color:#bbc5df;font-size:13px;margin:12px 0}a:hover,button:hover{border-color:#bacbff}button:focus-visible,a:focus-visible{outline:2px solid white;outline-offset:3px}
+</style>
+<style>[hidden]{display:none!important}#actions{margin:0 0 16px}</style>
+</head>
+<body>
+<main>
+<h1>先看白猫，再逐个检查花色</h1>
+<p>左边保留日常站姿，右边演示动作。选中小葵后，可以看她走路和怒叫的表情；叫时保持平顺的毛发，动作结束后恢复。这里与工厂使用相同的绘制代码。</p>
+<nav id="choices" aria-label="选择猫咪花色"></nav>
+<nav id="actions" aria-label="选择小葵的动作" hidden></nav>
+<canvas id="cats" width="900" height="440" role="img" aria-label="白猫站立和行走对照"></canvas>
+<div class="legend"><span>日常站姿</span><span id="action-label">日常走路</span></div>
+<footer><button id="pause">暂停动作</button><a id="factory-link" href="index.html">查看这只猫的加工过程</a><a id="art-comparison" href="review/逐只比对.html">与原稿逐只比对</a><a id="character-reference" href="圆头造型参考.png">查看造型稿</a></footer>
+</main>
+<script src="timeline.js"></script><script src="cat.js"></script><script src="cat-review.js"></script>
+</body>
+</html>

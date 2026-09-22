@@ -1,0 +1,134 @@
+{
+  "meow": {
+    "source": "cat-meow-mafon2.mp3",
+    "start": 0.0,
+    "end": 0.572,
+    "duration": 0.572,
+    "frames": 13728,
+    "peak": 0.649993896484375,
+    "fade_in": 0.004,
+    "fade_out": 0.014,
+    "source_peak_at": null
+  },
+  "angry": {
+    "source": "cat-angry-inspectorj.mp3",
+    "start": 0.2,
+    "end": 1.4,
+    "duration": 1.2,
+    "frames": 28800,
+    "peak": 0.649993896484375,
+    "fade_in": 0.004,
+    "fade_out": 0.014,
+    "source_peak_at": null
+  },
+  "meow-white": {
+    "source": "cat-sad-fmaudio.mp3",
+    "start": 0.25,
+    "end": 0.7,
+    "duration": 0.572,
+    "frames": 13728,
+    "peak": 0.649993896484375,
+    "fade_in": 0.004,
+    "fade_out": 0.014,
+    "source_peak_at": null
+  },
+  "meow-soft": {
+    "source": "cat-meow-fthgurdy.mp3",
+    "start": 0.0,
+    "end": 0.5641666666666667,
+    "duration": 0.572,
+    "frames": 13728,
+    "peak": 0.649993896484375,
+    "fade_in": 0.004,
+    "fade_out": 0.014,
+    "source_peak_at": null
+  },
+  "meow-bright": {
+    "source": "cat-meow-mbpl.mp3",
+    "start": 0.0,
+    "end": 0.552125,
+    "duration": 0.572,
+    "frames": 13728,
+    "peak": 0.649993896484375,
+    "fade_in": 0.004,
+    "fade_out": 0.014,
+    "source_peak_at": null
+  },
+  "meow-low": {
+    "source": "cat-meow-jofae.mp3",
+    "start": 0.04,
+    "end": 0.612,
+    "duration": 0.572,
+    "frames": 13728,
+    "peak": 0.649993896484375,
+    "fade_in": 0.004,
+    "fade_out": 0.014,
+    "source_peak_at": null
+  },
+  "grind": {
+    "source": "machine-grinder.mp3",
+    "start": 0.3,
+    "end": 1.72,
+    "duration": 1.42,
+    "frames": 34080,
+    "peak": 0.649993896484375,
+    "fade_in": 0.008,
+    "fade_out": 0.02,
+    "source_peak_at": null
+  },
+  "brew": {
+    "source": "machine-espresso-brewing.mp3",
+    "start": 7.0,
+    "end": 8.2,
+    "duration": 1.2,
+    "frames": 28800,
+    "peak": 0.649993896484375,
+    "fade_in": 0.008,
+    "fade_out": 0.02,
+    "source_peak_at": null
+  },
+  "steam": {
+    "source": "machine-steam-wand.mp3",
+    "start": 1.5,
+    "end": 2.5,
+    "duration": 1.0,
+    "frames": 24000,
+    "peak": 0.649993896484375,
+    "fade_in": 0.008,
+    "fade_out": 0.02,
+    "source_peak_at": null
+  },
+  "beans": {
+    "source": "machine-espresso-full.mp3",
+    "start": 2.0,
+    "end": 2.42,
+    "duration": 0.42,
+    "frames": 10080,
+    "peak": 0.649993896484375,
+    "fade_in": 0.008,
+    "fade_out": 0.02,
+    "source_peak_at": null
+  },
+  "latch": {
+    "source": "machine-espresso-full.mp3",
+    "start": 36.24529166666667,
+    "end": 36.51529166666667,
+    "duration": 0.27,
+    "frames": 6480,
+    "peak": 0.649993896484375,
+    "fade_in": 0.008,
+    "fade_out": 0.02,
+    "source_peak_at": 36.28029166666666
+  },
+  "land": {
+    "source": "machine-espresso-full.mp3",
+    "start": 48.818,
+    "end": 48.998,
+    "duration": 0.18,
+    "frames": 4320,
+    "peak": 0.649993896484375,
+    "fade_in": 0.008,
+    "fade_out": 0.02,
+    "source_peak_at": 48.838
+  }
+}

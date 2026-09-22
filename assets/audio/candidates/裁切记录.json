@@ -1,0 +1,26 @@
+{
+  "hiss-patchy": {
+    "source": "cat-hiss-patchy-audacitier.mp3",
+    "start": 0.0,
+    "end": 0.8467916666666667,
+    "duration": 0.8467916666666667,
+    "peak": 0.649993896484375,
+    "processing": "保留原速原音调；4毫秒淡入、14毫秒淡出，峰值统一"
+  },
+  "hiss-aunrea": {
+    "source": "cat-hiss-aunrea.mp3",
+    "start": 0.0,
+    "end": 0.6746666666666666,
+    "duration": 0.6746666666666666,
+    "peak": 0.649993896484375,
+    "processing": "保留原速原音调；4毫秒淡入、14毫秒淡出，峰值统一"
+  },
+  "hiss-lucy": {
+    "source": "cat-hiss-lucy.mp3",
+    "start": 6.1,
+    "end": 9.5,
+    "duration": 3.4,
+    "peak": 0.649993896484375,
+    "processing": "保留原速原音调；4毫秒淡入、14毫秒淡出，峰值统一"
+  }
+}
