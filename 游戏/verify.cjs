@@ -1,6 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const root=path.resolve(__dirname,'..'),F=require('../timeline.js'),R=require('./rules.js'),M=require('./collection-motion.js');
+const root=path.resolve(__dirname,'..'),built=!!process.env.CAT_GAME_BUILD,appDir=built?path.resolve(process.env.CAT_GAME_BUILD):__dirname;
+const sharedDir=built?appDir:root,F=require(path.join(sharedDir,'timeline.js')),R=require(path.join(appDir,'rules.js')),M=require(path.join(appDir,'collection-motion.js'));
 let checks=0;function check(label,fn){fn();checks++;console.log('通过：'+label);}
 const customBeans=['purple','purple','purple','purple','purple','purple','cream','cream','cream','cream','blue','blue'];
 const flatten=f=>Object.entries(f.counts).flatMap(([id,n])=>Array(n).fill(id));
@@ -48,7 +49,7 @@ check('收饼动作：提起后运送、到达再翻转、从篮口出饼、回�
  assert.equal(M.at(M.arrival).puck,null);assert.ok(M.at(M.arrival+.06).receive>0);assert.equal(M.at(8).receive,0);assert.equal(M.at(8).handle.locked,true);
  assert.equal(M.at(8).handle.x,435);assert.equal(M.at(8).handle.y,598);assert.equal(M.at(8).handle.roll,0);
  assert.deepEqual(M.at(6.9),M.at(6.9),'回拖和暂停重画一致');
- const sound=require('../sound.js'),timeline={recipes:F.recipes,mod:F.mod,voiceFor:F.voiceFor,xiaokuiVoice:F.xiaokuiVoice,manualBeans:true,collectAt:M.arrival};
+ const sound=require(path.join(sharedDir,'sound.js')),timeline={recipes:F.recipes,mod:F.mod,voiceFor:F.voiceFor,xiaokuiVoice:F.xiaokuiVoice,manualBeans:true,collectAt:M.arrival};
  assert.ok(sound.cuesAt(M.arrival,timeline).some(c=>c.type==='land'));assert.ok(!sound.cuesAt(7.27,timeline).some(c=>c.type==='land'));
 });
 function target(extra={}){
@@ -62,8 +63,9 @@ function target(extra={}){
  setAttribute(k,v){this.attributes[k]=v;},getAttribute(k){return this.attributes[k];},
  querySelectorAll(selector){let result=[];for(const c of this.children){if(c.tagName==='BUTTON'&&(!selector.includes(':disabled')||!c.disabled))result.push(c);if(c.querySelectorAll)result=result.concat(c.querySelectorAll(selector));}return result;},
  querySelector(s){return this.querySelectorAll(s)[0]||null;},closest(){return null;},contains(n){return n===this||this.children.some(c=>c.contains&&c.contains(n));},
- getBoundingClientRect(){return {left:0,right:375,top:600,bottom:680,width:375,height:80};},remove(){if(this.parentNode)this.parentNode.children=this.parentNode.children.filter(c=>c!==this);}
- },extra);return obj;
+ get firstChild(){return this.children[0]||null;},removeChild(child){this.children=this.children.filter(c=>c!==child);child.parentNode=null;return child;},
+    getBoundingClientRect(){return {left:0,right:375,top:600,bottom:680,width:375,height:80};},remove(){if(this.parentNode)this.parentNode.children=this.parentNode.children.filter(c=>c!==this);}
+ },extra);if(built)delete obj.replaceChildren;return obj;
 }
 function fixture(options={}){
  let clock=0,id=0,seed=1,calls=0,downloads=0;
@@ -72,10 +74,10 @@ function fixture(options={}){
  function canvas(){
   let depth=0;
   const c=target({tagName:'CANVAS',width:900,height:1200,toDataURL:()=> 'data:image/png;base64,aGVsbG8='});
-  const ctx=new Proxy({canvas:c},{get(o,k){if(k in o)return o[k];if(k==='depth')return depth;if(k==='save')return()=>{depth++;};if(k==='restore')return()=>{assert.ok(depth>0,'画布恢复不能越界');depth--;};if(k==='createLinearGradient')return()=>({addColorStop(){}});return(...args)=>{calls++;for(const a of args)if(typeof a==='number')assert.ok(Number.isFinite(a),'无效坐标 '+k);};}});
+  const ctx=new Proxy({canvas:c},{get(o,k){if(k in o)return o[k];if(k==='depth')return depth;if(k==='save')return()=>{depth++;};if(k==='restore')return()=>{assert.ok(depth>0,'画布恢复不能越界');depth--;};if(built&&k==='roundRect')return undefined;if(k==='createLinearGradient')return()=>({addColorStop(){}});return(...args)=>{calls++;for(const a of args)if(typeof a==='number')assert.ok(Number.isFinite(a),'无效坐标 '+k);};}});
   c.getContext=()=>ctx;contexts.push(ctx);return c;
  }
- const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8'),els={};
+ const html=fs.readFileSync(path.join(appDir,'index.html'),'utf8'),els={};
  for(const [,tag,attrs,name] of html.matchAll(/<(\w+)([^>]*?)\bid="([^"]+)"[^>]*>/g))els[name]=tag==='canvas'?canvas():target({tagName:tag.toUpperCase(),clientWidth:375});
  els['coffee-bean-art'].complete=true;els['coffee-bean-art'].naturalWidth=1254;
  const doc=target({hidden:false,readyState:'complete',activeElement:null,body:target(),getElementById:n=>els[n]||null,
@@ -86,13 +88,14 @@ function fixture(options={}){
  performance:{now:()=>clock},devicePixelRatio:1,innerWidth:375,innerHeight:812,location:{search:''},
  localStorage:{getItem:k=>local.has(k)?local.get(k):null,setItem(k,v){if(options.failStorage)throw Error('quota');local.set(k,v);},removeItem:k=>local.delete(k)},
  crypto:{getRandomValues(array){array[0]=seed++;return array;}},
- matchMedia:()=>({matches:false}),getComputedStyle:()=>({paddingBottom:'0px'}),
+ matchMedia:()=>({matches:false}),getComputedStyle:()=>({paddingTop:'12px',paddingBottom:'24px',paddingLeft:'12px',paddingRight:'12px'}),
  requestAnimationFrame(fn){frames.set(++id,fn);return id;},cancelAnimationFrame:i=>frames.delete(i),
  setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,clearInterval(){},atob:s=>Buffer.from(s,'base64').toString('binary'),
  xhs:options.xhs});host.window=host;
  vm.createContext(host);
+ if(built){delete FakePath.prototype.addPath;vm.runInContext('Object.fromEntries=undefined;Array.prototype.flatMap=undefined;',host);}
  for(const [,src]of html.matchAll(/<script src="([^"]+)"/g)){
-   const file=path.resolve(__dirname,src);assert.ok(fs.existsSync(file));vm.runInContext(fs.readFileSync(file,'utf8'),host,{filename:src});
+   const file=path.resolve(appDir,src);assert.ok(fs.existsSync(file));vm.runInContext(fs.readFileSync(file,'utf8'),host,{filename:src});
  }
  const flush=async()=>{for(let i=0;i<25;i++)await Promise.resolve();};
  function step(ms){clock+=ms;const pending=Array.from(frames.values());frames.clear();pending.forEach(fn=>fn(clock));}
@@ -128,7 +131,7 @@ function fixture(options={}){
  app.step(2000);app.els.progress.fire('pointerdown');app.els.progress.value='1.8';app.els.progress.fire('input');app.host.fire('pointerup');assert.equal(app.view().time,1.8);
  app.doc.hidden=true;app.doc.fire('visibilitychange');assert.equal(app.frames.size,0);app.step(50000);app.doc.hidden=false;app.doc.fire('visibilitychange');app.step(100);assert.ok(app.view().time<2);
  for(let i=0;i<70;i++)app.step(100);await app.flush();assert.equal(app.view().records.length,1);assert.equal(app.view().mode,'done');assert.equal(app.view().modal,'card');assert.equal(app.view().records[0].recipe.kind,'calico');
- app.els['save-card'].click();await app.flush();assert.equal(app.downloads(),1);assert.equal(app.els['save-status'].textContent,'');
+ app.els['save-card'].click();await app.flush();if(built){assert.equal(app.downloads(),0);assert.match(app.els['save-status'].textContent,/小红书/);}else{assert.equal(app.downloads(),1);assert.equal(app.els['save-status'].textContent,'');}
  app.els['card-close'].click();app.els.replay.click();for(let i=0;i<81;i++)app.step(100);await app.flush();assert.equal(app.view().records.length,1);assert.equal(app.view().records[0].count,1);
  app.els['card-next'].click();assert.equal(app.view().mode,'mix');assert.equal(app.view().beans.length,0);assert.equal(app.view().modal,null);
  app.addColor('purple',6);app.addColor('cream',4);app.addColor('blue',2);app.step(800);app.els.start.click();app.step(1200);assert.ok(app.view().batch.recipe.custom);
@@ -139,7 +142,7 @@ function fixture(options={}){
  for(const c of app.contexts)assert.equal(c.depth,0);
  const restored=fixture({local:app.local});await restored.flush();assert.equal(JSON.stringify(restored.view().records),JSON.stringify(app.view().records));
  restored.els['recipes-open'].click();const savedRecipe=restored.els['recipe-list'].children[R.formulas.findIndex(f=>f.kind==='calico')].children[1];assert.equal(savedRecipe.disabled,true);assert.equal(savedRecipe.textContent,'已拥有');assert.equal(restored.els['recipe-list'].children[0].children[1].disabled,false);restored.els['recipes-close'].click();
- console.log('通过：配豆 → 三花 → 收藏 → 猫卡下载 → 重播不重复领取 → 新批自创猫 → 收藏查看 → 刷新恢复。');checks++;
+ console.log('通过：配豆 → 三花 → 收藏 → 猫卡保存分支 → 重播不重复领取 → 新批自创猫 → 收藏查看 → 刷新恢复。');checks++;
  console.log('通过：收藏暂停恢复、进度拖动、后台不推进、自创猫无爆表与绘制状态平衡。');checks++;
  const failed=fixture({failStorage:true});await failed.flush();failed.els['recipes-open'].click();failed.els['recipe-list'].children[R.formulas.findIndex(f=>f.kind==='calico')].children[1].click();failed.step(1400);failed.els.start.click();failed.step(1200);failed.step(8000);await failed.flush();assert.equal(failed.view().records.length,1);assert.equal(failed.view().persistent,false);assert.equal(failed.view().modal,'card');
  console.log('通过：缓存失败仍能获得本次猫卡，并标记暂存。');checks++;
