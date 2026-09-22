@@ -104,7 +104,7 @@
     $('audio').disabled=true;
     const requested=!gameAudio.enabled;
     const enabled=await gameAudio.setEnabled(requested);
-    $('audio').textContent=enabled?'声音开':'声音关';$('audio').setAttribute('aria-pressed',String(enabled));$('audio').disabled=false;
+    $('audio').setAttribute('aria-pressed',String(enabled));$('audio').disabled=false;
     $('audio').setAttribute('aria-label',enabled?'关闭游戏音效':'开启游戏音效');
     if(requested&&!enabled)say('声音暂未开启，请再点一次');wake();
   });
@@ -289,6 +289,11 @@
   // Exact recipe summaries are refreshed once per newly frozen batch.
   $('start').addEventListener('click',()=>{if(game.batch)batchColors($('batch-colors'),game.batch.beans);});
   CatGameStore.load().then(result=>{game.records=result.records;game.persistent=result.persistent;game.ready=true;updateUI();wake();},()=>{game.ready=true;game.persistent=false;updateUI();wake();});
+  const collectionFace=$('collection-face'), facePaint=collectionFace.getContext('2d');
+  const xiaokuiFace=puckPortrait(F.recipes.find(recipe=>recipe.kind==='xiaokui')).image;
+  const faceScale=Math.min(132/xiaokuiFace.width,132/xiaokuiFace.height);
+  const faceWidth=xiaokuiFace.width*faceScale,faceHeight=xiaokuiFace.height*faceScale;
+  facePaint.drawImage(xiaokuiFace,(144-faceWidth)/2,(144-faceHeight)/2,faceWidth,faceHeight);
   renderRatios();fit();updateUI();wake();
   // Read-only diagnostics used by the local smoke checks; not shown in the product.
   window.CatGameDebug={snapshot:()=>JSON.parse(JSON.stringify(game)),state:getState,drawCard,drawFrame};

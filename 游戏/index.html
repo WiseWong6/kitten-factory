@@ -14,11 +14,13 @@
       <header class="game-header">
         <div><h1>小猫加工厂</h1><p class="author-credit">Created by @歪斯Wise</p></div>
         <button id="collection-open" class="collection-button" aria-label="打开猫咪收藏夹">
-          <svg viewBox="0 0 44 44" aria-hidden="true"><path d="M8 19 8 8Q8 5 11 7L19 13Q24 11 29 13L36 7Q38 6 38 10L37 23Q41 37 26 39L18 39Q4 36 8 19Z" fill="currentColor"/><ellipse cx="19" cy="25" rx="2" ry="3" fill="#172356"/><ellipse cx="30" cy="24" rx="1.7" ry="2.7" fill="#172356"/><path d="m23 30 3 0-1.5 2Z" fill="#172356"/></svg>
+          <canvas id="collection-face" width="144" height="144" aria-hidden="true"></canvas>
           <span id="collection-count">0</span>
         </button>
       </header>
-      <button id="audio" class="game-audio" aria-pressed="false" aria-label="开启游戏音效">声音关</button>
+      <button id="audio" class="game-audio" aria-pressed="false" aria-label="开启游戏音效">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9h4l5-4v14l-5-4H4Z" fill="currentColor"/><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path class="audio-on" d="M16 8a6 6 0 0 1 0 8M19 5a10 10 0 0 1 0 14"/><path class="audio-off" d="m17 9 5 6m0-6-5 6"/></g></svg>
+      </button>
       <section id="mix-panel" class="mix-panel" aria-label="豆子色盘">
         <div class="mix-heading"><span id="mix-label">选颜色，拖动配色条调比例</span><strong id="bean-count">0 种颜色</strong></div>
         <div id="palette" class="palette"></div>
