@@ -12,7 +12,7 @@
     <div id="factory-viewport"><section id="factory" aria-label="小猫加工厂">
       <canvas id="factory-art" width="900" height="1200" aria-label="咖啡机与等待加工的白猫"></canvas>
       <header class="game-header">
-        <div><span class="eyebrow">一杯颜色，一只小猫</span><h1>小猫加工厂</h1></div>
+        <div><h1>小猫加工厂</h1></div>
         <button id="collection-open" class="collection-button" aria-label="打开猫饼收藏夹">
           <svg viewBox="0 0 44 44" aria-hidden="true"><path d="M8 19 8 8Q8 5 11 7L19 13Q24 11 29 13L36 7Q38 6 38 10L37 23Q41 37 26 39L18 39Q4 36 8 19Z" fill="currentColor"/><ellipse cx="19" cy="25" rx="2" ry="3" fill="#172356"/><ellipse cx="30" cy="24" rx="1.7" ry="2.7" fill="#172356"/><path d="m23 30 3 0-1.5 2Z" fill="#172356"/></svg>
           <span id="collection-count">0</span>
@@ -26,7 +26,7 @@
         <div class="recipe-links"><button id="try-recipe" class="recipe-tip">试试三花 ↗</button><button id="recipes-open" class="recipe-tip">配方本 · 15 只猫 ↗</button></div>
       </section>
       <section id="making-panel" class="making-panel" hidden>
-        <span class="eyebrow">你的这一杯</span><h2 id="making-status">正在磨豆</h2>
+        <h2 id="making-status">正在磨豆</h2>
         <div id="batch-colors" class="batch-colors"></div>
         <button id="result-open" class="primary" hidden>查看猫卡</button>
         <button id="next-batch" class="quiet" hidden>再做一只</button>
@@ -50,8 +50,8 @@
     </div>
   </section>
   <section id="card-modal" class="overlay card-overlay" role="dialog" aria-modal="true" aria-labelledby="card-heading" hidden>
-    <div class="card-sheet"><div class="card-top"><h2 id="card-heading">你的新朋友</h2><button id="card-close" class="close" aria-label="关闭猫卡">×</button></div>
-      <canvas id="cat-card" width="900" height="1200" aria-label="猫咪收藏卡"></canvas>
+    <div class="card-sheet"><h2 id="card-heading" class="visually-hidden">你的新朋友</h2>
+      <div class="card-frame"><canvas id="cat-card" width="900" height="1200" aria-label="猫咪收藏卡"></canvas><button id="card-close" class="close" aria-label="关闭猫卡">×</button></div>
       <div class="card-actions"><button id="save-card" class="primary">保存猫卡</button><button id="card-next" class="secondary">再做一只</button></div>
       <p id="save-status" aria-live="polite"></p>
     </div>

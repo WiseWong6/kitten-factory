@@ -162,7 +162,8 @@
     const clock=v=>'00:'+String(Math.floor(v)).padStart(2,'0');$('clock').textContent=clock(game.time/game.rate)+' / '+clock(8/game.rate);
     $('result-open').hidden=$('next-batch').hidden=game.mode!=='done';
     if(game.batch){
-      const title=game.mode==='loading'?'豆子入仓，准备开工':game.mode==='done'?'这一只，做好了':game.time<1.56?'正在磨豆':game.time<3.35?'接粉 · 装上手柄':game.time<5.2?(game.batch.recipe.malfunction?'咦，机器今天没有颜色…':'给小猫穿上颜色'):game.time<6.82?'新朋友，出来啦':'收好这一枚猫饼';
+      $('making-status').hidden=game.mode==='done';
+      const title=game.mode==='loading'?'豆子入仓，准备开工':game.mode==='done'?'':game.time<1.56?'正在磨豆':game.time<3.35?'接粉 · 装上手柄':game.time<5.2?(game.batch.recipe.malfunction?'咦，机器今天没有颜色…':'给小猫穿上颜色'):game.time<6.82?'新朋友，出来啦':'收好这一枚猫饼';
       if(lastUI!==title){$('making-status').textContent=title;lastUI=title;}
     }
   }
@@ -225,14 +226,11 @@
     const c=$('cat-card').getContext('2d'),r=record.recipe;
     c.clearRect(0,0,900,1200);c.fillStyle='#FFF3DF';rounded(c,0,0,900,1200,40);c.fill();
     c.fillStyle='#172356';c.textAlign='left';c.font='500 20px sans-serif';c.fillText('小 猫 加 工 厂',56,66);
-    c.textAlign='right';c.font='18px sans-serif';c.fillText(record.known?'配方命中':'独家调色',844,66);
-    c.fillStyle='#0E3CF1';rounded(c,36,100,828,730,24);c.fill();
-    c.save();c.beginPath();c.rect(36,100,828,730);c.clip();
-    c.globalAlpha=.14;c.fillStyle='#172356';c.beginPath();c.ellipse(455,697,272,19,0,0,Math.PI*2);c.fill();c.globalAlpha=1;
+    c.fillStyle='#0E3CF1';rounded(c,36,100,828,890,24);c.fill();
+    c.save();c.beginPath();c.rect(36,100,828,890);c.clip();
+    c.globalAlpha=.14;c.fillStyle='#172356';c.beginPath();c.ellipse(455,777,272,19,0,0,Math.PI*2);c.fill();c.globalAlpha=1;
     const state={recipe:r,index:0,x:0,walking:0,walkDistance:0,coat:1,baseCoat:1,tailLift:1,reaction:{}};
-    CatArt.draw(c,state,1,{x:451,y:691,scale:r.kind==='xiaokui'?2.3:2.65,noBlink:true});c.restore();
-    c.fillStyle='#172356';c.textAlign='center';c.font='600 49px sans-serif';c.fillText(r.name,450,925);
-    c.font='22px sans-serif';c.fillStyle='#72758B';c.fillText(record.known?'刚刚好，是这一只。':'这一杯颜色，只属于你。',450,970);
+    CatArt.draw(c,state,1,{x:451,y:771,scale:r.kind==='xiaokui'?2.3:2.65,noBlink:true});c.restore();
     const tally=R.counts(record.beans),colors=R.palette.filter(p=>tally[p.id]);
     colors.forEach((p,i)=>{const x=450+(i-(colors.length-1)/2)*220;c.beginPath();c.arc(x-31,1040,17,0,Math.PI*2);c.fillStyle=p.hex;c.fill();c.lineWidth=1;c.strokeStyle='#D6CDBE';c.stroke();c.fillStyle='#172356';c.font='22px sans-serif';c.textAlign='left';c.fillText(p.name+' '+Math.round(tally[p.id]/record.beans.length*100)+'%',x-4,1048);});
     c.strokeStyle='#DAD1C1';c.beginPath();c.moveTo(56,1100);c.lineTo(844,1100);c.stroke();
