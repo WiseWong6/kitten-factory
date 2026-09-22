@@ -231,7 +231,7 @@
   function drawCard(record){
     const c=$('cat-card').getContext('2d'),r=record.recipe;
     c.clearRect(0,0,900,1200);c.fillStyle='#FFF3DF';rounded(c,0,0,900,1200,40);c.fill();
-    c.fillStyle='#172356';c.textAlign='left';c.font='500 20px sans-serif';c.fillText('小 猫 加 工 厂',56,66);
+    c.fillStyle='#172356';c.textAlign='left';c.font='600 32px sans-serif';c.fillText(r.name,56,66,690);
     c.fillStyle='#0E3CF1';rounded(c,36,100,828,890,24);c.fill();
     c.save();c.beginPath();c.rect(36,100,828,890);c.clip();
     c.globalAlpha=.14;c.fillStyle='#172356';c.beginPath();c.ellipse(455,777,272,19,0,0,Math.PI*2);c.fill();c.globalAlpha=1;
