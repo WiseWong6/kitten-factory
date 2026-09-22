@@ -11,6 +11,8 @@
   let last=performance.now(), now=last, frame=null, toastTimer, lastUI='',lastFocus=null,dragging=false,wasPlaying=false;
   coffeeBeanArt=$('coffee-bean-art');ctx=paint;
   const beanSlots=F.hopperBeans(0,true);
+  // Scene coordinates: release beside the collection button, then tuck into its center.
+  const collectionDrop={x:820,y:235},collectionTarget={x:(802-81)/.82,y:(80+50)/.82};
   const paletteButtons=[];
   const uid=()=>window.crypto&&window.crypto.getRandomValues?window.crypto.getRandomValues(new Uint32Array(1))[0]:Math.floor(Math.random()*4294967296);
   function say(text){$('toast').textContent=text;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2400);}
@@ -129,11 +131,11 @@
     const s=F.stateAt(index*8+p);s.time=p;s.round=0;s.recipe=recipe;s.hopperRecipe=recipe;s.previousRecipe=recipe;
     s.hopper=p<2.4?F.hopperBeans(p,true):[];s.pucks=[];
     if(p<5.8)s.handle=F.handlePose(p,false);
-    else {s.handle=F.handlePose(Math.min(p-5.8,2.14),true,{x:450,y:920});s.handle.loading=false;s.handle.used=p<6.82;s.handle.powder=s.handle.used?1:0;}
+    else {s.handle=F.handlePose(Math.min(p-5.8,2.14),true,collectionDrop);s.handle.loading=false;s.handle.used=p<6.82;s.handle.powder=s.handle.used?1:0;}
     const cat=F.catState(index*8+p,index);cat.recipe=recipe;
     if(recipe.custom)cat.reaction=F.catState(8*8+p,8).reaction;
     s.cats=[cat];
-    if(p>=6.82){const u=F.clamp((p-6.82)/.9);s.pucks=[{recipe,x:F.lerp(450,822,F.ease(u)),y:F.lerp(920,240,F.ease(u))-140*Math.sin(Math.PI*u),alpha:p<7.74?1:Math.max(0,1-(p-7.74)/.2),angle:0,falling:true}];}
+    if(p>=6.82){const u=F.clamp((p-6.82)/.9);s.pucks=[{recipe,x:F.lerp(collectionDrop.x,collectionTarget.x,F.ease(u)),y:F.lerp(collectionDrop.y,collectionTarget.y,F.ease(u)),alpha:p<7.74?1:Math.max(0,1-(p-7.74)/.2),angle:0,falling:true}];}
     return s;
   }
   function drawFrame(){
