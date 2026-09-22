@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const root=path.resolve(__dirname,'..'),F=require('../timeline.js'),R=require('./rules.js');
+const root=path.resolve(__dirname,'..'),F=require('../timeline.js'),R=require('./rules.js'),M=require('./collection-motion.js');
 let checks=0;function check(label,fn){fn();checks++;console.log('通过：'+label);}
 const customBeans=['purple','purple','purple','purple','purple','purple','cream','cream','cream','cream','blue','blue'];
 const flatten=f=>Object.entries(f.counts).flatMap(([id,n])=>Array(n).fill(id));
@@ -34,6 +34,22 @@ check('比例匹配：全橘、旧橘配方、轻微偏差及银渐层区间',()
  assert.equal(R.make(from({silver:40,white:60}),1,F.recipes,1000).known,false);
  const legacy=R.make(Array(12).fill('orange'),1,F.recipes,1000,1);assert.equal(legacy.known,false);assert.equal(R.make(legacy.beans,legacy.seed,F.recipes,legacy.createdAt,1).id,legacy.id);
  for(let n=1;n<=3;n++){const parts=R.portions(Object.fromEntries(R.palette.slice(0,n).map(p=>[p.id,1])));assert.equal(R.expand(parts).length,100);}
+});
+check('收饼动作：提起后运送、到达再翻转、从篮口出饼、回位与时钟一致',()=>{
+ assert.deepEqual(M.at(M.start).handle,{x:435,y:598,yaw:0,roll:0,locked:true,loading:false,used:true,powder:1});
+ for(const t of [6,6.14,6.82,M.release,7.18,7.82,7.92,8]){
+   const a=M.at(t-1e-5).handle,b=M.at(t+1e-5).handle;
+   assert.ok(Math.hypot(a.x-b.x,a.y-b.y)<.05,'手柄不能跳位 '+t);assert.ok(Math.abs(a.roll-b.roll)<.001,'翻转连续 '+t);assert.ok(Math.abs(a.yaw-b.yaw)<.001,'旋转连续 '+t);
+ }
+ for(let t=6.14;t<6.82;t+=.005){const s=M.at(t);assert.ok(Math.abs(s.handle.roll)<=.1);assert.equal(s.puck,null);}
+ for(let t=M.start;t<=8;t+=.005){const a=M.at(t),b=M.at(t+.005);assert.ok(Math.hypot(a.handle.x-b.handle.x,a.handle.y-b.handle.y)<10,'运送速度过快');assert.ok(a.handle.x>=435-1e-5&&a.handle.x<=761);assert.ok(a.handle.y>=259&&a.handle.y<650);}
+ const launch=M.at(M.release).puck;assert.equal(launch.x,M.origin.x);assert.equal(launch.y,M.origin.y);
+ const end=M.at(M.arrival-1e-5).puck;assert.ok(Math.hypot(end.x-M.target.x,end.y-M.target.y)<.001);assert.ok(end.scale<.22);assert.ok(end.alpha<.001);
+ assert.equal(M.at(M.arrival).puck,null);assert.ok(M.at(M.arrival+.06).receive>0);assert.equal(M.at(8).receive,0);assert.equal(M.at(8).handle.locked,true);
+ assert.equal(M.at(8).handle.x,435);assert.equal(M.at(8).handle.y,598);assert.equal(M.at(8).handle.roll,0);
+ assert.deepEqual(M.at(6.9),M.at(6.9),'回拖和暂停重画一致');
+ const sound=require('../sound.js'),timeline={recipes:F.recipes,mod:F.mod,voiceFor:F.voiceFor,xiaokuiVoice:F.xiaokuiVoice,manualBeans:true,collectAt:M.arrival};
+ assert.ok(sound.cuesAt(M.arrival,timeline).some(c=>c.type==='land'));assert.ok(!sound.cuesAt(7.27,timeline).some(c=>c.type==='land'));
 });
 function target(extra={}){
  const handlers={},classes=new Set();
@@ -87,7 +103,7 @@ function fixture(options={}){
 (async()=>{
  const mix=fixture();await mix.flush();
  mix.addColor('orange');assert.equal(mix.els.start.disabled,false);assert.equal(mix.view().beans.length,100);mix.addColor('orange');assert.equal(mix.view().mix.length,1);assert.equal(mix.view().history.length,1);
- mix.els.start.click();assert.equal(mix.view().mode,'loading');mix.step(300);mix.doc.hidden=true;mix.doc.fire('visibilitychange');mix.step(10000);mix.doc.hidden=false;mix.doc.fire('visibilitychange');mix.step(100);assert.equal(mix.view().mode,'loading');mix.step(1200);assert.equal(mix.view().batch.recipe.kind,'ginger');mix.els.progress.value='6.8';mix.els.progress.fire('input');assert.ok(mix.host.CatGameDebug.state().handle.x>800);assert.ok(mix.host.CatGameDebug.state().handle.y<240);mix.els.progress.value='6.82';mix.els.progress.fire('input');assert.equal(mix.host.CatGameDebug.state().pucks[0].x,820);mix.els.progress.value='7.72';mix.els.progress.fire('input');assert.ok(Math.abs(mix.host.CatGameDebug.state().pucks[0].x-(802-81)/.82)<.01);mix.step(8000);await mix.flush();mix.els['card-next'].click();
+ mix.els.start.click();assert.equal(mix.view().mode,'loading');mix.step(300);mix.doc.hidden=true;mix.doc.fire('visibilitychange');mix.step(10000);mix.doc.hidden=false;mix.doc.fire('visibilitychange');mix.step(100);assert.equal(mix.view().mode,'loading');mix.step(1200);assert.equal(mix.view().batch.recipe.kind,'ginger');mix.els.progress.value='6.7';mix.els.progress.fire('input');assert.ok(Math.abs(mix.host.CatGameDebug.state().handle.roll)<.11);mix.els.progress.value=String(M.release);mix.els.progress.fire('input');assert.equal(mix.host.CatGameDebug.state().pucks[0].x,M.origin.x);mix.els.progress.value=String(M.arrival);mix.els.progress.fire('input');assert.equal(mix.host.CatGameDebug.state().pucks.length,0);assert.ok(mix.host.CatGameDebug.state().receive>0);assert.equal(mix.view().records.length,1);mix.step(8000);await mix.flush();mix.els['card-next'].click();
  mix.addColor('white');mix.addColor('orange');mix.addColor('black');mix.addColor('purple');assert.equal(mix.view().mix.length,3);assert.equal(mix.view().mix[0].amount,34);
  let bar=mix.els['ratio-controls'].children[1],handle=bar.children[3];handle.fire('pointerdown',{pointerId:1});handle.fire('pointermove',{clientX:187.5});handle.fire('pointerup');assert.equal(mix.view().mix[0].amount,50);assert.equal(mix.view().beans.length,100);
  mix.els.undo.click();assert.equal(mix.view().mix[0].amount,34);
@@ -108,7 +124,7 @@ function fixture(options={}){
  app.step(2000);app.els.progress.fire('pointerdown');app.els.progress.value='1.8';app.els.progress.fire('input');app.host.fire('pointerup');assert.equal(app.view().time,1.8);
  app.doc.hidden=true;app.doc.fire('visibilitychange');assert.equal(app.frames.size,0);app.step(50000);app.doc.hidden=false;app.doc.fire('visibilitychange');app.step(100);assert.ok(app.view().time<2);
  for(let i=0;i<70;i++)app.step(100);await app.flush();assert.equal(app.view().records.length,1);assert.equal(app.view().mode,'done');assert.equal(app.view().modal,'card');assert.equal(app.view().records[0].recipe.kind,'calico');
- app.els['save-card'].click();await app.flush();assert.equal(app.downloads(),1);assert.match(app.els['save-status'].textContent,/下载/);
+ app.els['save-card'].click();await app.flush();assert.equal(app.downloads(),1);assert.equal(app.els['save-status'].textContent,'');
  app.els['card-close'].click();app.els.replay.click();for(let i=0;i<81;i++)app.step(100);await app.flush();assert.equal(app.view().records.length,1);assert.equal(app.view().records[0].count,1);
  app.els['card-next'].click();assert.equal(app.view().mode,'mix');assert.equal(app.view().beans.length,0);assert.equal(app.view().modal,null);
  app.addColor('purple',6);app.addColor('cream',4);app.addColor('blue',2);app.step(800);app.els.start.click();app.step(1200);assert.ok(app.view().batch.recipe.custom);

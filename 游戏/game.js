@@ -1,18 +1,16 @@
 /* The game owns input/state. Approved scene functions supply the machine and character art. */
 (function(){
   'use strict';
-  const R=CatGameRules, $=id=>document.getElementById(id);
+  const R=CatGameRules, M=CatCollectionMotion, $=id=>document.getElementById(id);
   const canvas=$('factory-art'), paint=canvas.getContext('2d');
   const game={mix:[],history:[],beans:[],added:[],mode:'mix',time:0,playing:false,rate:1,batch:null,awarded:false,
     records:[],page:0,modal:null,card:null,cardFrom:null,restorePlay:false,ready:false,persistent:true,saving:false};
   const white=F.recipes.find(r=>r.kind==='white');
-  const audioTimeline={recipes:[white],mod:F.mod,voiceFor:r=>F.voiceFor(r.custom?{kind:'bicolor'}:r),xiaokuiVoice:F.xiaokuiVoice,manualBeans:true};
+  const audioTimeline={recipes:[white],mod:F.mod,voiceFor:r=>F.voiceFor(r.custom?{kind:'bicolor'}:r),xiaokuiVoice:F.xiaokuiVoice,manualBeans:true,collectAt:M.arrival};
   const gameAudio=FactorySound.create(audioTimeline);
   let last=performance.now(), now=last, frame=null, toastTimer, lastUI='',lastFocus=null,dragging=false,wasPlaying=false;
   coffeeBeanArt=$('coffee-bean-art');ctx=paint;
   const beanSlots=F.hopperBeans(0,true);
-  // Scene coordinates: release beside the collection button, then tuck into its center.
-  const collectionDrop={x:820,y:235},collectionTarget={x:(802-81)/.82,y:(80+50)/.82};
   const paletteButtons=[];
   const uid=()=>window.crypto&&window.crypto.getRandomValues?window.crypto.getRandomValues(new Uint32Array(1))[0]:Math.floor(Math.random()*4294967296);
   function say(text){$('toast').textContent=text;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2400);}
@@ -36,7 +34,7 @@
   }
   function renderRatios(){
     const holder=$('ratio-controls');holder.replaceChildren();
-    if(!game.mix.length){const hint=document.createElement('p');hint.className='ratio-empty';hint.textContent='点一种颜色就能做猫，也可以混色';holder.appendChild(hint);return;}
+    if(!game.mix.length)return;
     const labels=document.createElement('div');labels.className='ratio-labels';
     const bar=document.createElement('div');bar.className='ratio-bar';
     const segments=[],texts=[],handles=[];
@@ -97,24 +95,25 @@
     gameAudio.reset();lastUI='';updateUI();wake();$('palette').querySelector('button').focus();
   }
   $('next-batch').addEventListener('click',next);$('card-next').addEventListener('click',next);
-  function replay(){if(!game.batch||game.mode==='loading')return;gameAudio.reset();game.time=0;game.mode='making';game.playing=true;last=performance.now();updateUI();wake();}
+  function replay(){if(game.modal||!game.batch||game.mode==='loading')return;gameAudio.reset();game.time=0;game.mode='making';game.playing=true;last=performance.now();updateUI();wake();}
   $('replay').addEventListener('click',replay);
-  $('pause').addEventListener('click',()=>{if(!game.batch||game.mode==='done')return;game.playing=!game.playing;last=performance.now();updateUI();wake();});
-  $('speed').addEventListener('click',()=>{const rates=[.5,1,1.5,2,3];game.rate=rates[(rates.indexOf(game.rate)+1)%rates.length];last=performance.now();gameAudio.reset();updateUI();});
+  $('pause').addEventListener('click',()=>{if(game.modal||!game.batch||game.mode==='done')return;game.playing=!game.playing;last=performance.now();updateUI();wake();});
+  $('speed').addEventListener('click',()=>{if(game.modal)return;const rates=[.5,1,1.5,2,3];game.rate=rates[(rates.indexOf(game.rate)+1)%rates.length];last=performance.now();gameAudio.reset();updateUI();});
   $('audio').addEventListener('click',async()=>{
+    if(game.modal)return;
     $('audio').disabled=true;
     const enabled=await gameAudio.setEnabled(!gameAudio.enabled);
     $('audio').textContent=enabled?'声音开':'声音关';$('audio').setAttribute('aria-pressed',String(enabled));$('audio').disabled=false;
     if(!enabled)say('声音已关闭或当前环境暂不可播放');wake();
   });
-  function dragStart(){if(!game.batch||dragging)return;dragging=true;wasPlaying=game.playing;game.playing=false;gameAudio.reset();}
+  function dragStart(){if(game.modal||!game.batch||dragging)return;dragging=true;wasPlaying=game.playing;game.playing=false;gameAudio.reset();}
   function dragEnd(){if(!dragging)return;dragging=false;game.playing=wasPlaying&&game.mode!=='done';last=performance.now();updateUI();wake();}
   $('progress').addEventListener('pointerdown',dragStart);
   $('progress').addEventListener('touchstart',dragStart,{passive:true});
   ['pointerup','pointercancel','touchend','touchcancel','blur'].forEach(type=>window.addEventListener(type,dragEnd));
   $('progress').addEventListener('input',()=>{
-    if(!game.batch)return;game.time=F.clamp(Number($('progress').value)||0,0,8);game.mode=game.time>=8?'done':'making';gameAudio.reset();
-    if(game.time>=8)award();drawFrame();updateUI();
+    if(game.modal||!game.batch)return;game.time=F.clamp(Number($('progress').value)||0,0,8);game.mode=game.time>=8?'done':'making';gameAudio.reset();
+    if(game.time>=M.arrival)award();drawFrame();updateUI();
   });
   function getState(){
     if(game.mode==='mix'||game.mode==='loading'){
@@ -130,20 +129,27 @@
     const s=F.stateAt(index*8+p);s.time=p;s.round=0;s.recipe=recipe;s.hopperRecipe=recipe;s.previousRecipe=recipe;
     s.hopper=p<2.4?F.hopperBeans(p,true):[];s.pucks=[];
     if(p<5.8)s.handle=F.handlePose(p,false);
-    else {s.handle=F.handlePose(Math.min(p-5.8,2.14),true,collectionDrop);s.handle.loading=false;s.handle.used=p<6.82;s.handle.powder=s.handle.used?1:0;}
+    else s.handle=M.at(p).handle;
     const cat=F.catState(index*8+p,index);cat.recipe=recipe;
     if(recipe.custom)cat.reaction=F.catState(8*8+p,8).reaction;
     s.cats=[cat];
-    if(p>=6.82){const u=F.clamp((p-6.82)/.9);s.pucks=[{recipe,x:F.lerp(collectionDrop.x,collectionTarget.x,F.ease(u)),y:F.lerp(collectionDrop.y,collectionTarget.y,F.ease(u)),alpha:p<7.74?1:Math.max(0,1-(p-7.74)/.2),angle:0,falling:true}];}
+    const collection=M.at(p);s.receive=collection.receive;
+    if(collection.puck)s.pucks=[Object.assign({recipe},collection.puck)];
     return s;
   }
   function drawFrame(){
     if(!paint||!coffeeBeanArt)return;
     ctx=paint;paint.setTransform(canvas.width/900,0,0,canvas.height/1200,0,0);paint.fillStyle='#0E3CF1';paint.fillRect(0,0,900,1200);
-    paint.save();paint.translate(81,-50);paint.scale(.82,.82);
+    paint.save();paint.translate(M.view.x,M.view.y);paint.scale(M.view.scale,M.view.scale);
     const s=getState();machine(s);conveyor(s);steamWand(s);coffeeFlow(s);
     s.cats.forEach(cat=>CatArt.draw(paint,cat,s.time));
-    groundCoffee(s);portafilter(s.handle);secondaryMist(s);spentPuck(s);paint.restore();
+    groundCoffee(s);
+    // The face emerges from behind the rim, then becomes the foreground object.
+    const paintPucks=()=>s.pucks.forEach(puck=>{paint.save();paint.translate(puck.x,puck.y);paint.rotate(puck.angle);paint.scale(puck.scale,puck.scale);paint.globalAlpha=puck.alpha;drawCatPuck(puck.recipe);paint.restore();});
+    const emerging=game.time<M.release+.09;
+    if(emerging)paintPucks();portafilter(s.handle);secondaryMist(s);if(!emerging)paintPucks();paint.restore();
+    $('collection-open').style.setProperty('--receive-scale',String(1+(s.receive||0)*.18));
+    $('collection-open').style.setProperty('--receive-ring',((s.receive||0)*9)+'px');
   }
   function updateUI(){
     const mixing=game.mode==='mix',ready=game.ready,tally=R.counts(game.beans);
@@ -180,14 +186,15 @@
     frame=null;now=stamp;const delta=Math.max(0,(stamp-last)/1000);last=stamp;
     if(document.hidden)return;
     if(game.mode==='making'&&game.playing&&!game.modal&&!dragging){game.time=Math.min(8,game.time+delta*game.rate);if(game.time>=8)finish();}
+    if(game.mode==='making'&&game.time>=M.arrival)award();
     if(game.mode==='loading'&&!game.modal&&isSettled())beginMaking();
     drawFrame();updateUI();gameAudio.sync(game.time,game.mode==='making'&&game.playing&&!game.modal&&!dragging,game.rate);
     if((game.mode==='making'&&game.playing&&!game.modal)||(game.mode==='loading'&&!game.modal))frame=requestAnimationFrame(tick);
   }
   function wake(){if(frame===null&&!document.hidden){last=performance.now();frame=requestAnimationFrame(tick);}}
-  function pauseForModal(){game.modalAt=performance.now();lastFocus=document.activeElement;game.restorePlay=game.playing;game.playing=false;gameAudio.reset();updateUI();}
-  function restoreAfterModal(){if(game.mode==='loading')game.added=game.added.map(t=>t+performance.now()-game.modalAt);game.playing=game.restorePlay;game.restorePlay=false;last=performance.now();updateUI();wake();if(lastFocus&&lastFocus.isConnected)lastFocus.focus();}
-  function closeAll(restore){$('collection').hidden=true;$('card-modal').hidden=true;$('recipes-modal').hidden=true;game.modal=null;if(restore)restoreAfterModal();}
+  function pauseForModal(){$('game-controls').inert=true;game.modalAt=performance.now();lastFocus=document.activeElement;game.restorePlay=game.playing;game.playing=false;gameAudio.reset();updateUI();}
+  function restoreAfterModal(){$('game-controls').inert=false;if(game.mode==='loading')game.added=game.added.map(t=>t+performance.now()-game.modalAt);game.playing=game.restorePlay;game.restorePlay=false;last=performance.now();updateUI();wake();if(lastFocus&&lastFocus.isConnected)lastFocus.focus();}
+  function closeAll(restore){$('game-controls').inert=false;$('collection').hidden=true;$('card-modal').hidden=true;$('recipes-modal').hidden=true;game.modal=null;if(restore)restoreAfterModal();}
   function openCollection(){if(game.modal)return;pauseForModal();game.modal='collection';$('collection').hidden=false;renderCollection();$('collection-close').focus();}
   $('collection-open').addEventListener('click',openCollection);
   $('collection-close').addEventListener('click',()=>closeAll(true));
@@ -216,7 +223,8 @@
     }
     $('page-label').textContent=(game.page+1)+' / '+pages;$('prev-page').disabled=game.page===0;$('next-page').disabled=game.page>=pages-1;
     $('retry-storage').hidden=game.persistent;
-    $('storage-note').textContent=game.persistent?'收藏保存在当前设备，喜欢的猫卡记得保存。':'本次收藏暂未写入存储，请先保存喜欢的猫卡。';$('storage-note').classList.toggle('warning',!game.persistent);
+    $('storage-note').hidden=game.persistent;
+    $('storage-note').textContent=game.persistent?'':'本次收藏暂未写入存储，请先保存喜欢的猫卡。';$('storage-note').classList.toggle('warning',!game.persistent);
   }
   $('retry-storage').addEventListener('click',async()=>{
     $('retry-storage').disabled=true;game.persistent=await CatGameStore.save(game.records);$('retry-storage').disabled=false;renderCollection();say(game.persistent?'收藏已保存':'暂时无法保存，请先留下猫卡图片');
@@ -258,7 +266,7 @@
         if(!mini||typeof mini.writeTempFile!=='function'||typeof mini.saveImageToPhotosAlbum!=='function')throw new Error('当前环境暂不支持保存到相册');
         const result=await mini.writeTempFile({data});await mini.saveImageToPhotosAlbum({filePath:result.filePath});$('save-status').textContent='猫卡已保存到相册';
       }else{
-        const a=document.createElement('a');a.href=data;a.download=game.card.recipe.name+'-猫卡.png';document.body.appendChild(a);a.click();a.remove();$('save-status').textContent='已发起图片下载，请查看浏览器下载记录';
+        const a=document.createElement('a');a.href=data;a.download=game.card.recipe.name+'-猫卡.png';document.body.appendChild(a);a.click();a.remove();$('save-status').textContent='';
       }
     }catch(e){$('save-status').textContent='保存未完成，可以重试。'+(e&&e.message||'请检查相册权限。');}
     finally{game.saving=false;$('save-card').disabled=false;}

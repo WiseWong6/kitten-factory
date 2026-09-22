@@ -37,7 +37,7 @@
     // One recorded scatter for each batch, timed to the first bean landing.
     if (!timeline.manualBeans && round === 0) add('bean', 'beans', .68, .42, .18);
     if (!timeline.manualBeans) add('bean', 'beans', 5.88, .42, .18);
-    add('land', 'land', 7.27, .18, .18);
+    add('land', 'land', timeline.collectAt === undefined ? 7.27 : timeline.collectAt, .18, .18);
     return cues;
   }
   function decodeClip(clip, decodeBase64) {

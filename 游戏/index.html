@@ -13,7 +13,7 @@
       <canvas id="factory-art" width="900" height="1200" aria-label="咖啡机与等待加工的白猫"></canvas>
       <header class="game-header">
         <div><h1>小猫加工厂</h1></div>
-        <button id="collection-open" class="collection-button" aria-label="打开猫饼收藏夹">
+        <button id="collection-open" class="collection-button" aria-label="打开猫咪收藏夹">
           <svg viewBox="0 0 44 44" aria-hidden="true"><path d="M8 19 8 8Q8 5 11 7L19 13Q24 11 29 13L36 7Q38 6 38 10L37 23Q41 37 26 39L18 39Q4 36 8 19Z" fill="currentColor"/><ellipse cx="19" cy="25" rx="2" ry="3" fill="#172356"/><ellipse cx="30" cy="24" rx="1.7" ry="2.7" fill="#172356"/><path d="m23 30 3 0-1.5 2Z" fill="#172356"/></svg>
           <span id="collection-count">0</span>
         </button>
@@ -31,22 +31,17 @@
         <button id="result-open" class="primary" hidden>查看猫卡</button>
         <button id="next-batch" class="quiet" hidden>再做一只</button>
       </section>
-    </section></div>
-    <div id="game-controls" class="playback" role="group" aria-label="制作过程播放控制">
-      <button id="pause" disabled>暂停</button><input id="progress" type="range" min="0" max="8" step="0.01" value="0" aria-label="制作进度" disabled>
-      <button id="replay" disabled>重播</button><button id="speed">1×</button><button id="audio" aria-pressed="false">声音关</button><output id="clock">00:00 / 00:08</output>
-    </div>
-  </main>
+
   <section id="recipes-modal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="recipes-title" hidden>
     <div class="collection-sheet"><header><div><span class="eyebrow">选一只，调好它的颜色</span><h2 id="recipes-title">配方本</h2></div><button id="recipes-close" class="close" aria-label="关闭配方本">×</button></header>
     <p class="recipe-help">比例接近就能做出来。点击「使用配方」会替你调好颜色，再点开始制作。</p><div id="recipe-list" class="recipe-list"></div></div>
   </section>
   <section id="collection" class="overlay" role="dialog" aria-modal="true" aria-labelledby="collection-title" hidden>
-    <div class="collection-sheet"><header><div><span class="eyebrow">每一只，都是你调出来的</span><h2 id="collection-title">猫饼收藏夹</h2></div><button id="collection-close" class="close" aria-label="关闭收藏夹">×</button></header>
+    <div class="collection-sheet"><header><div><h2 id="collection-title">猫咪收藏夹</h2></div><button id="collection-close" class="close" aria-label="关闭收藏夹">×</button></header>
       <p id="collection-summary"></p><div id="puck-grid" class="puck-grid"></div><p id="empty-collection">还没有猫饼。<br>调好第一杯颜色，就能带一只回家。</p>
       <nav class="page-nav" aria-label="收藏翻页"><button id="prev-page" class="quiet">上一页</button><span id="page-label">1 / 1</span><button id="next-page" class="quiet">下一页</button></nav>
       <button id="retry-storage" class="quiet" hidden>重试保存收藏</button>
-      <p id="storage-note" class="storage-note">收藏保存在当前设备，喜欢的猫卡记得保存。</p>
+      <p id="storage-note" class="storage-note" hidden></p>
     </div>
   </section>
   <section id="card-modal" class="overlay card-overlay" role="dialog" aria-modal="true" aria-labelledby="card-heading" hidden>
@@ -56,10 +51,16 @@
       <p id="save-status" aria-live="polite"></p>
     </div>
   </section>
+    </section></div>
+    <div id="game-controls" class="playback" role="group" aria-label="制作过程播放控制">
+      <button id="pause" disabled>暂停</button><input id="progress" type="range" min="0" max="8" step="0.01" value="0" aria-label="制作进度" disabled>
+      <button id="replay" disabled>重播</button><button id="speed">1×</button><button id="audio" aria-pressed="false">声音关</button><output id="clock">00:00 / 00:08</output>
+    </div>
+  </main>
   <div id="toast" role="status" aria-live="polite"></div>
   <img id="coffee-bean-art" src="../assets/coffee-bean.png" alt="" hidden>
   <script src="../timeline.js"></script><script src="rules.js"></script><script src="custom-art.js"></script><script src="../cat.js"></script>
   <script src="../assets/audio/clips.js"></script><script src="../sound.js"></script><script src="../scene.js"></script>
-  <script src="storage.js"></script><script src="game.js"></script>
+  <script src="storage.js"></script><script src="collection-motion.js"></script><script src="game.js"></script>
 </body>
 </html>
