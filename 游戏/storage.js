@@ -8,7 +8,7 @@
     const unique=new Map();
     for(const r of data.records){
       if(!root.CatGameRules.validRecord(r) || !Number.isFinite(r.createdAt)) continue;
-      const restored=root.CatGameRules.make(r.beans,r.seed,root.FactoryTimeline.recipes,r.createdAt);
+      const restored=root.CatGameRules.make(r.beans,r.seed,root.FactoryTimeline.recipes,r.createdAt,r.recipeVersion||1);
       if(restored.id!==r.id) continue;
       restored.count=r.count; unique.set(restored.id,restored);
     }

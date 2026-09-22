@@ -22,6 +22,19 @@ check('已有猫累计次数，自创猫分别保存',()=>{
  const a=R.make(flatten(R.formulas[0]),1,F.recipes,1000),b=R.make(customBeans,2,F.recipes,1000),c=R.make(customBeans,3,F.recipes,1000);
  let list=R.collect([],a);list=R.collect(list,a);list=R.collect(list,b);list=R.collect(list,c);assert.equal(list.length,3);assert.equal(list[0].count,2);
 });
+check('比例匹配：全橘、旧橘配方、轻微偏差及银渐层区间',()=>{
+ const from=value=>R.expand(R.portions(value));
+ for(const f of R.formulas){const result=R.make(from(f.counts),9,F.recipes,1000);assert.equal(result.recipe.kind,f.kind);assert.equal(result.recipe.beanColors.length,12);assert.equal(new Set(result.recipe.beanColors).size,Object.keys(f.counts).length);}
+ assert.equal(R.make(from({orange:1}),1,F.recipes,1000).recipe.kind,'ginger');
+ assert.equal(R.make(from({orange:9,cream:3}),1,F.recipes,1000).recipe.kind,'ginger');
+ assert.equal(R.make(from({white:48,orange:26,black:26}),1,F.recipes,1000).recipe.kind,'calico');
+ assert.equal(R.make(from({white:50,orange:49,black:1}),1,F.recipes,1000).known,false);
+ assert.equal(R.make(from({silver:22,white:78}),1,F.recipes,1000).recipe.kind,'silvershaded');
+ assert.equal(R.make(from({silver:60,white:40}),1,F.recipes,1000).recipe.kind,'silver');
+ assert.equal(R.make(from({silver:40,white:60}),1,F.recipes,1000).known,false);
+ const legacy=R.make(Array(12).fill('orange'),1,F.recipes,1000,1);assert.equal(legacy.known,false);assert.equal(R.make(legacy.beans,legacy.seed,F.recipes,legacy.createdAt,1).id,legacy.id);
+ for(let n=1;n<=3;n++){const parts=R.portions(Object.fromEntries(R.palette.slice(0,n).map(p=>[p.id,1])));assert.equal(R.expand(parts).length,100);}
+});
 function target(extra={}){
  const handlers={},classes=new Set();
  const obj=Object.assign({children:[],hidden:false,disabled:false,value:'',textContent:'',isConnected:true,attributes:{},
@@ -68,12 +81,29 @@ function fixture(options={}){
  const flush=async()=>{for(let i=0;i<25;i++)await Promise.resolve();};
  function step(ms){clock+=ms;const pending=Array.from(frames.values());frames.clear();pending.forEach(fn=>fn(clock));}
  const view=()=>host.CatGameDebug.snapshot();
- function addColor(id,n){const at=R.palette.findIndex(p=>p.id===id);for(let i=0;i<n;i++)els.palette.children[at].click();}
+ function addColor(id){const at=R.palette.findIndex(p=>p.id===id);els.palette.children[at].click();}
  return{host,els,doc,step,view,flush,local,contexts,frames,addColor,downloads:()=>downloads,calls:()=>calls};
 }
 (async()=>{
+ const mix=fixture();await mix.flush();
+ mix.addColor('orange');assert.equal(mix.els.start.disabled,false);assert.equal(mix.view().beans.length,100);mix.addColor('orange');assert.equal(mix.view().mix.length,1);assert.equal(mix.view().history.length,1);
+ mix.els.start.click();assert.equal(mix.view().mode,'loading');mix.step(300);mix.doc.hidden=true;mix.doc.fire('visibilitychange');mix.step(10000);mix.doc.hidden=false;mix.doc.fire('visibilitychange');mix.step(100);assert.equal(mix.view().mode,'loading');mix.step(1200);assert.equal(mix.view().batch.recipe.kind,'ginger');mix.step(8000);await mix.flush();mix.els['card-next'].click();
+ mix.addColor('white');mix.addColor('orange');mix.addColor('black');mix.addColor('purple');assert.equal(mix.view().mix.length,3);assert.equal(mix.view().mix[0].amount,34);
+ let bar=mix.els['ratio-controls'].children[1],handle=bar.children[3];handle.fire('pointerdown',{pointerId:1});handle.fire('pointermove',{clientX:187.5});handle.fire('pointerup');assert.equal(mix.view().mix[0].amount,50);assert.equal(mix.view().beans.length,100);
+ mix.els.undo.click();assert.equal(mix.view().mix[0].amount,34);
+ bar=mix.els['ratio-controls'].children[1];handle=bar.children[3];handle.fire('keydown',{key:'End'});assert.equal(mix.view().mix[1].amount,1);handle.fire('keydown',{key:'Home'});assert.equal(mix.view().mix[0].amount,1);
+ mix.els['ratio-controls'].children[0].children[1].children[1].click();assert.equal(mix.view().mix.length,2);assert.equal(mix.view().beans.length,100);
+ mix.els.clear.click();assert.equal(mix.view().beans.length,0);assert.ok(mix.els.start.disabled);mix.els.undo.click();assert.equal(mix.view().mix.length,2);
+ mix.els['recipes-open'].click();assert.equal(mix.view().modal,'recipes');assert.equal(mix.els['recipe-list'].children.length,15);
+ for(let i=0;i<15;i++){
+   if(i)mix.els['recipes-open'].click();mix.els['recipe-list'].children[i].children[1].click();assert.equal(mix.view().modal,null);assert.equal(R.make(mix.view().beans,1,F.recipes,1000).recipe.kind,R.formulas[i].kind);
+ }
+ mix.host.innerWidth=320;mix.host.innerHeight=568;mix.host.fire('resize');assert.ok(Math.abs(parseFloat(mix.els['factory-viewport'].style.height)/parseFloat(mix.els['game-shell'].style.width)-4/3)<1e-10);assert.ok(parseFloat(mix.els['game-shell'].style.width)<=296);
+ const legacy=R.make(Array(12).fill('orange'),8,F.recipes,888,1);delete legacy.recipeVersion;
+ const old=fixture({local:new Map([['cat-factory-game-v1',JSON.stringify({version:1,records:[legacy]})]])});await old.flush();assert.equal(old.view().records.length,1);assert.equal(old.view().records[0].id,legacy.id);assert.equal(old.view().records[0].recipe.kind,'custom');
+ console.log('通过：选色两步制橘猫、重复点不累加、三色上限、拖动/键盘比例、删除/撤销、十五配方套用、3:4尺寸与旧收藏兼容。');checks++;
  const app=fixture();await app.flush();assert.ok(app.view().ready);
- app.els['try-recipe'].click();app.step(1400);assert.equal(app.els.start.disabled,false);app.els.start.click();app.els.start.click();assert.equal(app.view().mode,'making');assert.equal(app.view().batch.recipe.kind,'calico');
+ app.els['try-recipe'].click();app.step(1400);assert.equal(app.els.start.disabled,false);app.els.start.click();app.els.start.click();assert.equal(app.view().mode,'loading');app.step(1200);assert.equal(app.view().mode,'making');assert.equal(app.view().batch.recipe.kind,'calico');
  app.step(2000);const when=app.view().time;app.els['collection-open'].click();app.step(2000);assert.equal(app.view().time,when);app.els['collection-close'].click();
  app.step(2000);app.els.progress.fire('pointerdown');app.els.progress.value='1.8';app.els.progress.fire('input');app.host.fire('pointerup');assert.equal(app.view().time,1.8);
  app.doc.hidden=true;app.doc.fire('visibilitychange');assert.equal(app.frames.size,0);app.step(50000);app.doc.hidden=false;app.doc.fire('visibilitychange');app.step(100);assert.ok(app.view().time<2);
@@ -81,7 +111,7 @@ function fixture(options={}){
  app.els['save-card'].click();await app.flush();assert.equal(app.downloads(),1);assert.match(app.els['save-status'].textContent,/下载/);
  app.els['card-close'].click();app.els.replay.click();for(let i=0;i<81;i++)app.step(100);await app.flush();assert.equal(app.view().records.length,1);assert.equal(app.view().records[0].count,1);
  app.els['card-next'].click();assert.equal(app.view().mode,'mix');assert.equal(app.view().beans.length,0);assert.equal(app.view().modal,null);
- app.addColor('purple',6);app.addColor('cream',4);app.addColor('blue',2);app.step(800);app.els.start.click();assert.ok(app.view().batch.recipe.custom);
+ app.addColor('purple',6);app.addColor('cream',4);app.addColor('blue',2);app.step(800);app.els.start.click();app.step(1200);assert.ok(app.view().batch.recipe.custom);
  assert.equal(app.host.CatGameDebug.state().overload,0,'自创猫不能沿用小葵爆表');
  for(let i=0;i<81;i++)app.step(100);await app.flush();assert.equal(app.view().records.length,2);const custom=app.view().records[1];
  app.els['card-close'].click();app.els['collection-open'].click();assert.equal(app.els['puck-grid'].children.length,2);app.els['puck-grid'].children[1].click();assert.equal(app.view().card.id,custom.id);
@@ -90,7 +120,7 @@ function fixture(options={}){
  const restored=fixture({local:app.local});await restored.flush();assert.equal(JSON.stringify(restored.view().records),JSON.stringify(app.view().records));
  console.log('通过：配豆 → 三花 → 收藏 → 猫卡下载 → 重播不重复领取 → 新批自创猫 → 收藏查看 → 刷新恢复。');checks++;
  console.log('通过：收藏暂停恢复、进度拖动、后台不推进、自创猫无爆表与绘制状态平衡。');checks++;
- const failed=fixture({failStorage:true});await failed.flush();failed.els['try-recipe'].click();failed.step(1400);failed.els.start.click();failed.step(8000);await failed.flush();assert.equal(failed.view().records.length,1);assert.equal(failed.view().persistent,false);assert.equal(failed.view().modal,'card');
+ const failed=fixture({failStorage:true});await failed.flush();failed.els['try-recipe'].click();failed.step(1400);failed.els.start.click();failed.step(1200);failed.step(8000);await failed.flush();assert.equal(failed.view().records.length,1);assert.equal(failed.view().persistent,false);assert.equal(failed.view().modal,'card');
  console.log('通过：缓存失败仍能获得本次猫卡，并标记暂存。');checks++;
  // Paint all approved results and 120 generated coats, including all pattern/face combinations.
  for(const formula of R.formulas)app.host.CatGameDebug.drawCard(R.make(flatten(formula),9,F.recipes,1000));
