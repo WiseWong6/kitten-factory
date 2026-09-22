@@ -103,7 +103,7 @@ function fixture(options={}){
  const old=fixture({local:new Map([['cat-factory-game-v1',JSON.stringify({version:1,records:[legacy]})]])});await old.flush();assert.equal(old.view().records.length,1);assert.equal(old.view().records[0].id,legacy.id);assert.equal(old.view().records[0].recipe.kind,'custom');
  console.log('通过：选色两步制橘猫、重复点不累加、三色上限、拖动/键盘比例、删除/撤销、十五配方套用、3:4尺寸与旧收藏兼容。');checks++;
  const app=fixture();await app.flush();assert.ok(app.view().ready);
- app.els['try-recipe'].click();app.step(1400);assert.equal(app.els.start.disabled,false);app.els.start.click();app.els.start.click();assert.equal(app.view().mode,'loading');app.step(1200);assert.equal(app.view().mode,'making');assert.equal(app.view().batch.recipe.kind,'calico');
+ app.els['recipes-open'].click();app.els['recipe-list'].children[R.formulas.findIndex(f=>f.kind==='calico')].children[1].click();app.step(1400);assert.equal(app.els.start.disabled,false);app.els.start.click();app.els.start.click();assert.equal(app.view().mode,'loading');app.step(1200);assert.equal(app.view().mode,'making');assert.equal(app.view().batch.recipe.kind,'calico');
  app.step(2000);const when=app.view().time;app.els['collection-open'].click();app.step(2000);assert.equal(app.view().time,when);app.els['collection-close'].click();
  app.step(2000);app.els.progress.fire('pointerdown');app.els.progress.value='1.8';app.els.progress.fire('input');app.host.fire('pointerup');assert.equal(app.view().time,1.8);
  app.doc.hidden=true;app.doc.fire('visibilitychange');assert.equal(app.frames.size,0);app.step(50000);app.doc.hidden=false;app.doc.fire('visibilitychange');app.step(100);assert.ok(app.view().time<2);
@@ -120,7 +120,7 @@ function fixture(options={}){
  const restored=fixture({local:app.local});await restored.flush();assert.equal(JSON.stringify(restored.view().records),JSON.stringify(app.view().records));
  console.log('通过：配豆 → 三花 → 收藏 → 猫卡下载 → 重播不重复领取 → 新批自创猫 → 收藏查看 → 刷新恢复。');checks++;
  console.log('通过：收藏暂停恢复、进度拖动、后台不推进、自创猫无爆表与绘制状态平衡。');checks++;
- const failed=fixture({failStorage:true});await failed.flush();failed.els['try-recipe'].click();failed.step(1400);failed.els.start.click();failed.step(1200);failed.step(8000);await failed.flush();assert.equal(failed.view().records.length,1);assert.equal(failed.view().persistent,false);assert.equal(failed.view().modal,'card');
+ const failed=fixture({failStorage:true});await failed.flush();failed.els['recipes-open'].click();failed.els['recipe-list'].children[R.formulas.findIndex(f=>f.kind==='calico')].children[1].click();failed.step(1400);failed.els.start.click();failed.step(1200);failed.step(8000);await failed.flush();assert.equal(failed.view().records.length,1);assert.equal(failed.view().persistent,false);assert.equal(failed.view().modal,'card');
  console.log('通过：缓存失败仍能获得本次猫卡，并标记暂存。');checks++;
  // Paint all approved results and 120 generated coats, including all pattern/face combinations.
  for(const formula of R.formulas)app.host.CatGameDebug.drawCard(R.make(flatten(formula),9,F.recipes,1000));

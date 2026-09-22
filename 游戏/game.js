@@ -79,7 +79,6 @@
   });
   $('undo').addEventListener('click',()=>{if(game.history.length)setMix(game.history.pop(),false);});
   $('clear').addEventListener('click',()=>setMix([]));
-  $('try-recipe').addEventListener('click',()=>{if(game.mode==='mix'&&game.ready)setMix(R.portions({white:6,orange:3,black:3}));});
   function start(){
     if(game.mode!=='mix'||!game.ready||!R.check(game.beans,true))return;
     game.batch=R.make(game.beans,uid(),F.recipes,Date.now());game.time=0;game.mode='loading';game.playing=false;game.awarded=false;
@@ -152,7 +151,7 @@
     $('bean-count').textContent=game.mix.length+' 种颜色';
     paletteButtons.forEach(({color,button,count})=>{const n=tally[color.id]||0;button.disabled=!mixing||!ready;button.setAttribute('aria-pressed',String(n>0));count.hidden=!n;count.textContent=n+'%';});
     $('undo').disabled=!mixing||!game.history.length;$('clear').disabled=!mixing||!game.beans.length;
-    $('try-recipe').disabled=$('recipes-open').disabled=!ready;
+    $('recipes-open').disabled=!ready;
     $('start').disabled=!mixing||!ready||!game.mix.length;
     $('start').textContent=game.mix.length?'开始做猫':'选好颜色，开始做猫';
     $('collection-count').textContent=game.records.length;$('collection-open').disabled=!ready;
