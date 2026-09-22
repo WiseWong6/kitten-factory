@@ -200,8 +200,9 @@
       const row=document.createElement('div');row.className='recipe-row';const info=document.createElement('div'),title=document.createElement('strong'),detail=document.createElement('div');
       const parts=R.portions(formula.counts);title.textContent=formula.kind==='ginger'?'大橘':F.recipes.find(r=>r.kind===formula.kind).name;
       detail.className='recipe-colors';parts.forEach(part=>{const color=R.palette.find(p=>p.id===part.id),tag=document.createElement('span'),dot=document.createElement('i');dot.style.background=color.hex;tag.append(dot,document.createTextNode(color.name+' '+part.amount+'%'));detail.appendChild(tag);});
-      info.append(title,detail);const use=document.createElement('button');use.className='secondary';use.textContent='使用配方';use.setAttribute('aria-label','使用'+title.textContent+'配方');
-      use.addEventListener('click',()=>{if(game.mode!=='mix')return;closeAll(true);setMix(parts.map(p=>({...p})));$('start').focus();});row.append(info,use);$('recipe-list').appendChild(row);
+      info.append(title,detail);const use=document.createElement('button'),owned=()=>game.records.some(r=>r.id==='known-'+formula.kind);
+      use.className='secondary';use.disabled=owned();use.textContent=use.disabled?'已拥有':'使用配方';use.setAttribute('aria-label',use.disabled?'已拥有'+title.textContent:'使用'+title.textContent+'配方');
+      use.addEventListener('click',()=>{if(game.mode!=='mix'||owned())return;closeAll(true);setMix(parts.map(p=>({...p})));$('start').focus();});row.append(info,use);$('recipe-list').appendChild(row);
     });$('recipes-close').focus();
   });
   $('recipes-close').addEventListener('click',()=>closeAll(true));

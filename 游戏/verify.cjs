@@ -112,7 +112,11 @@ function fixture(options={}){
  mix.els.clear.click();assert.equal(mix.view().beans.length,0);assert.ok(mix.els.start.disabled);mix.els.undo.click();assert.equal(mix.view().mix.length,2);
  mix.els['recipes-open'].click();assert.equal(mix.view().modal,'recipes');assert.equal(mix.els['recipe-list'].children.length,15);
  for(let i=0;i<15;i++){
-   if(i)mix.els['recipes-open'].click();mix.els['recipe-list'].children[i].children[1].click();assert.equal(mix.view().modal,null);assert.equal(R.make(mix.view().beans,1,F.recipes,1000).recipe.kind,R.formulas[i].kind);
+   if(i)mix.els['recipes-open'].click();
+   const button=mix.els['recipe-list'].children[i].children[1],owned=mix.view().records.some(r=>r.id==='known-'+R.formulas[i].kind);
+   assert.equal(button.disabled,owned);
+   if(owned){const before=JSON.stringify(mix.view().mix);assert.equal(button.textContent,'已拥有');button.click();button.fire('click');assert.equal(mix.view().modal,'recipes');assert.equal(JSON.stringify(mix.view().mix),before);mix.els['recipes-close'].click();}
+   else{button.click();assert.equal(mix.view().modal,null);assert.equal(R.make(mix.view().beans,1,F.recipes,1000).recipe.kind,R.formulas[i].kind);}
  }
  mix.host.innerWidth=320;mix.host.innerHeight=568;mix.host.fire('resize');assert.ok(Math.abs(parseFloat(mix.els['factory-viewport'].style.height)/parseFloat(mix.els['game-shell'].style.width)-4/3)<1e-10);assert.ok(parseFloat(mix.els['game-shell'].style.width)<=296);
  const legacy=R.make(Array(12).fill('orange'),8,F.recipes,888,1);delete legacy.recipeVersion;
@@ -134,6 +138,7 @@ function fixture(options={}){
  app.els['card-close'].click();assert.equal(app.view().modal,'collection');app.els['collection-close'].click();
  for(const c of app.contexts)assert.equal(c.depth,0);
  const restored=fixture({local:app.local});await restored.flush();assert.equal(JSON.stringify(restored.view().records),JSON.stringify(app.view().records));
+ restored.els['recipes-open'].click();const savedRecipe=restored.els['recipe-list'].children[R.formulas.findIndex(f=>f.kind==='calico')].children[1];assert.equal(savedRecipe.disabled,true);assert.equal(savedRecipe.textContent,'已拥有');assert.equal(restored.els['recipe-list'].children[0].children[1].disabled,false);restored.els['recipes-close'].click();
  console.log('通过：配豆 → 三花 → 收藏 → 猫卡下载 → 重播不重复领取 → 新批自创猫 → 收藏查看 → 刷新恢复。');checks++;
  console.log('通过：收藏暂停恢复、进度拖动、后台不推进、自创猫无爆表与绘制状态平衡。');checks++;
  const failed=fixture({failStorage:true});await failed.flush();failed.els['recipes-open'].click();failed.els['recipe-list'].children[R.formulas.findIndex(f=>f.kind==='calico')].children[1].click();failed.step(1400);failed.els.start.click();failed.step(1200);failed.step(8000);await failed.flush();assert.equal(failed.view().records.length,1);assert.equal(failed.view().persistent,false);assert.equal(failed.view().modal,'card');
