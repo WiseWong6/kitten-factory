@@ -8,7 +8,7 @@
   const white=F.recipes.find(r=>r.kind==='white');
   const audioTimeline={recipes:[white],mod:F.mod,voiceFor:r=>F.voiceFor(r.custom?{kind:'bicolor'}:r),xiaokuiVoice:F.xiaokuiVoice,manualBeans:true,collectAt:M.arrival};
   const gameAudio=FactorySound.create(audioTimeline);
-  let last=performance.now(), now=last, frame=null, toastTimer, lastUI='',lastFocus=null,dragging=false,wasPlaying=false;
+  let last=performance.now(), now=last, frame=null, toastTimer, lastFocus=null,dragging=false,wasPlaying=false;
   coffeeBeanArt=$('coffee-bean-art');ctx=paint;
   const beanSlots=F.hopperBeans(0,true);
   const paletteButtons=[];
@@ -87,12 +87,12 @@
     game.mode='making';game.playing=true;game.added=[];
     audioTimeline.recipes[0]=game.batch.recipe;gameAudio.reset();
     const base=F.primary(game.batch.recipe);GROUND_PALETTES.set('custom',[base,game.batch.recipe.ink,game.batch.recipe.accent]);
-    last=performance.now();lastUI='';updateUI();
+    last=performance.now();updateUI();
   }
   $('start').addEventListener('click',start);
   function next(){
     closeAll(false);PUCK_PORTRAITS.clear();game.mode='mix';game.playing=false;game.time=0;game.batch=null;game.beans=[];game.mix=[];game.history=[];game.added=[];game.awarded=false;renderRatios();
-    gameAudio.reset();lastUI='';updateUI();wake();$('palette').querySelector('button').focus();
+    gameAudio.reset();updateUI();wake();$('palette').querySelector('button').focus();
   }
   $('next-batch').addEventListener('click',next);$('card-next').addEventListener('click',next);
   function replay(){if(game.modal||!game.batch||game.mode==='loading')return;gameAudio.reset();game.time=0;game.mode='making';game.playing=true;last=performance.now();updateUI();wake();}
@@ -168,12 +168,8 @@
     $('speed').textContent=game.rate+'×';
     const clock=v=>'00:'+String(Math.floor(v)).padStart(2,'0');$('clock').textContent=clock(game.time/game.rate)+' / '+clock(8/game.rate);
     $('result-open').hidden=$('next-batch').hidden=game.mode!=='done';
-    if(game.batch){
-      $('making-status').hidden=game.mode==='done';
-      const title=game.mode==='loading'?'豆子入仓，准备开工':game.mode==='done'?'':game.time<1.56?'正在磨豆':game.time<3.35?'接粉 · 装上手柄':game.time<5.2?(game.batch.recipe.malfunction?'咦，机器今天没有颜色…':'给小猫穿上颜色'):game.time<6.82?'新朋友，出来啦':'收好这一枚猫饼';
-      if(lastUI!==title){$('making-status').textContent=title;lastUI=title;}
-    }
   }
+
   function batchColors(container,beans){container.replaceChildren();const tally=R.counts(beans);R.palette.filter(p=>tally[p.id]).forEach(p=>{const span=document.createElement('span'),i=document.createElement('i');i.style.background=p.hex;span.appendChild(i);span.appendChild(document.createTextNode(p.name+' '+Math.round(tally[p.id]/beans.length*100)+'%'));container.appendChild(span);});}
   async function award(){
     if(game.awarded||!game.batch)return;
