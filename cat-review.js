@@ -27,7 +27,7 @@ function selectCat(index) {
   const kind = FactoryTimeline.recipes[selected]?.kind;
   const derived = ['goldtabby', 'white', 'orangewhite', 'silvershaded', 'bengal'].includes(kind);
   const newCoat = ['ginger', 'calico', 'gray'].includes(kind);
-  document.getElementById('character-reference').href = newCoat ? '美术审核/新花色六猫-v1.png' : kind === 'xiaokui' ? '小葵形象设定-v10.png' : '圆头造型参考.png';
+  document.getElementById('character-reference').href = newCoat ? '美术审核/新花色六猫-v1.png' : kind === 'xiaokui' ? '美术审核/小葵设定/小葵形象设定-v10.png' : '美术审核/分镜与造型/圆头造型参考.png';
   document.getElementById('art-comparison').hidden = derived;
   document.getElementById('character-reference').hidden = ['goldtabby', 'silvershaded'].includes(kind);
   if (kind === 'bengal') document.getElementById('character-reference').href = '美术审核/豹猫优化参考-v1.png';

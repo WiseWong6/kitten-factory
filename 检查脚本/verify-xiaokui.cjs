@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
-const Cat = require('./cat.js');
-const F = require('./timeline.js');
+const Cat = require('../cat.js');
+const F = require('../timeline.js');
 const recipe = F.recipes.find(r => r.kind === 'xiaokui');
 
 // Sample the paths actually sent to Canvas, including clipping and animation.

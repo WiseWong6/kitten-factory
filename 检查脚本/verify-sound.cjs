@@ -4,9 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const { atob } = require('node:buffer');
-const F = require('./timeline.js');
-const S = require('./sound.js');
-const clips = require('./assets/audio/clips.js');
+const F = require('../timeline.js');
+const S = require('../sound.js');
+const clips = require('../assets/audio/clips.js');
 const EPS = 1e-6;
 const close = (a, b, message) => assert.ok(Math.abs(a - b) < EPS, message || a + ' ≠ ' + b);
 let checks = 0;
@@ -153,7 +153,7 @@ async function main() {
     for (const [name, clip] of Object.entries(clips)) {
       const bytes = Buffer.from(clip.data, 'base64');
       assert.equal(bytes.toString('base64'), clip.data, name + ' 的编码有效');
-      const data = S.decodeClip(clip, atob), wav = readWav(path.join(__dirname, 'assets/audio/clips', name + '.wav'));
+      const data = S.decodeClip(clip, atob), wav = readWav(path.join(require('node:path').resolve(__dirname, '..'), 'assets/audio/clips', name + '.wav'));
       assert.equal(data.length, clip.frames); assert.equal(bytes.length, clip.frames * 2);
       assert.equal(wav.rate, clip.rate); assert.deepEqual(wav.data, bytes, name + ' 与源 WAV 必须逐字节相同');
       let peak = 0, power = 0;
@@ -173,13 +173,13 @@ async function main() {
     for (const invalid of [undefined, { rate: 0, frames: 1, data: 'AAA=' }, { rate: 24000, frames: 2, data: 'AAA=' }]) {
       assert.throws(() => S.decodeClip(invalid, atob));
     }
-    const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'index.html'), 'utf8');
     const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/g)].map(m => m[1]);
     const clipIndex = scripts.indexOf('assets/audio/clips.js'), soundIndex = scripts.indexOf('sound.js');
     assert.ok(clipIndex >= 0 && soundIndex > clipIndex);
     const browser = { window: {}, atob };
-    vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'assets/audio/clips.js'), 'utf8'), browser);
-    vm.runInNewContext(fs.readFileSync(path.join(__dirname, 'sound.js'), 'utf8'), browser);
+    vm.runInNewContext(fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'assets/audio/clips.js'), 'utf8'), browser);
+    vm.runInNewContext(fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'sound.js'), 'utf8'), browser);
     assert.equal(JSON.stringify(browser.window.FactoryAudioClips), JSON.stringify(clips));
     assert.equal(typeof browser.window.FactorySound.create, 'function');
     assert.equal(typeof browser.window.FactorySound.cuesAt, 'function');

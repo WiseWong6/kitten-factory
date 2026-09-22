@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const F = require('./timeline.js');
+const F = require('../timeline.js');
 const cycleSeconds = F.recipes.length * 8;
 const newCoatKinds = ['ginger', 'calico', 'gray'];
 let checks = 0;
@@ -193,7 +193,7 @@ check('白猫停稳后上主色，再喷辅色，完成后离开', () => {
   assert.equal(F.coffeeFlow(4.56), null);
 });
 check('小葵染色后怒叫，身体和尾巴不膨胀，离场不等待声音结束', () => {
-  const CatArt = require('./cat.js');
+  const CatArt = require('../cat.js');
   const xiaokuiIndex = F.recipes.findIndex(recipe => recipe.kind === 'xiaokui');
   const voice = F.xiaokuiVoice, end = voice.start + voice.duration;
   for (let index = 0; index < F.recipes.length * 2; index++) {
@@ -559,13 +559,13 @@ check('手柄、压力与喷棒可见动作边界连续，循环前后复位', (
   }
 });
 check('离线入口资源齐全，没有联网加载或模块服务器依赖', () => {
-  const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  const html = fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'index.html'), 'utf8');
   const refs = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(m => m[1]);
-  for (const file of refs) { assert.ok(!/^https?:/.test(file)); assert.ok(fs.existsSync(path.join(__dirname, file))); }
+  for (const file of refs) { assert.ok(!/^https?:/.test(file)); assert.ok(fs.existsSync(path.join(require('node:path').resolve(__dirname, '..'), file))); }
   for (const name of ['index.html', 'scene.js', 'timeline.js', 'cat.js']) {
-    assert.ok(!/\bfetch\s*\(|XMLHttpRequest|type="module"/.test(fs.readFileSync(path.join(__dirname, name), 'utf8')));
+    assert.ok(!/\bfetch\s*\(|XMLHttpRequest|type="module"/.test(fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), name), 'utf8')));
   }
-  assert.equal(fs.readFileSync(path.join(__dirname, 'vendor/p5.min.js'), 'utf8'), fs.readFileSync(path.join(__dirname, '../xiaokui-balloon-drive/vendor/p5.min.js'), 'utf8'));
+  assert.equal(fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'vendor/p5.min.js'), 'utf8'), fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), '../xiaokui-balloon-drive/vendor/p5.min.js'), 'utf8'));
 });
 
 // Non-browser rendering-contract smoke check. It does not inspect pixels or validate appearance.
@@ -660,11 +660,11 @@ function factorySandbox(search = '', soundDriver = null) {
   pixelDensity() {}, frameRate() {}
   };
   vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync(path.join(__dirname, 'cat.js'), 'utf8'), sandbox);
+  vm.runInContext(fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'cat.js'), 'utf8'), sandbox);
   sandbox.CatArt = sandbox.window.CatArt;
-  vm.runInContext(fs.readFileSync(path.join(__dirname, 'sound.js'), 'utf8'), sandbox);
+  vm.runInContext(fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'sound.js'), 'utf8'), sandbox);
   if (soundDriver) sandbox.window.FactorySound = { create: () => soundDriver };
-  vm.runInContext(fs.readFileSync(path.join(__dirname, 'scene.js'), 'utf8'), sandbox);
+  vm.runInContext(fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'scene.js'), 'utf8'), sandbox);
   return sandbox;
 }
 function renderedPucks(app, time) {
@@ -861,7 +861,7 @@ check('不同窗口为播放条与安全区域留白，画幅保持完整 3:4 �
       }
     }
   } finally { sandbox.window.getComputedStyle = originalComputedStyle; }
-  const css = fs.readFileSync(path.join(__dirname, 'style.css'), 'utf8');
+  const css = fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'style.css'), 'utf8');
   assert.match(css, /--playback-space:\s*max\(84px,\s*calc\(env\(safe-area-inset-bottom,\s*0px\)\s*\+\s*68px\)\)/, '样式表应同时保留基本播放条空间和设备安全区域');
   assert.match(css, /body\s*\{[^}]*padding-bottom:\s*var\(--playback-space\)/, '预留空间必须实际应用到容器');
 });
@@ -1016,7 +1016,7 @@ check('形态页直接选中小葵及新增花色，切换花色与工厂链接�
       document: { getElementById: id => elements[id], createElement: element, addEventListener() {}, hidden: false },
       CatArt: { draw: (_ctx, state) => rendered.push(state) }, requestAnimationFrame: fn => { nextFrame = fn; } };
     vm.createContext(app);
-    vm.runInContext(fs.readFileSync(path.join(__dirname, 'cat-review.js'), 'utf8'), app);
+    vm.runInContext(fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'cat-review.js'), 'utf8'), app);
     const buttons = elements.choices.children;
     assert.equal(buttons.length, F.recipes.length + 1);
     assert.deepEqual(buttons.filter(button => button.attributes['aria-pressed'] === 'true'), [buttons[selectedIndex]]);
@@ -1024,9 +1024,9 @@ check('形态页直接选中小葵及新增花色，切换花色与工厂链接�
     if (['goldtabby', 'white', 'orangewhite', 'silvershaded', 'bengal'].includes(selectedRecipe?.kind)) {
       assert.equal(elements['art-comparison'].hidden, true);
       assert.equal(elements['character-reference'].hidden, ['goldtabby', 'silvershaded'].includes(selectedRecipe.kind));
-      if (!['goldtabby', 'silvershaded'].includes(selectedRecipe.kind)) assert.ok(fs.existsSync(path.join(__dirname, elements['character-reference'].href)));
+      if (!['goldtabby', 'silvershaded'].includes(selectedRecipe.kind)) assert.ok(fs.existsSync(path.join(require('node:path').resolve(__dirname, '..'), elements['character-reference'].href)));
     } else if (!newCoatKinds.includes(selectedRecipe?.kind)) {
-      assert.equal(elements['character-reference'].href, selectedRecipe ? '小葵形象设定-v10.png' : '圆头造型参考.png');
+      assert.equal(elements['character-reference'].href, selectedRecipe ? '美术审核/小葵设定/小葵形象设定-v10.png' : '美术审核/分镜与造型/圆头造型参考.png');
       assert.equal(elements['art-comparison'].href, selectedRecipe ? 'output/playwright/xiaokui/compare.html' : 'review/逐只比对.html');
     }
     nextFrame(1000);
@@ -1043,7 +1043,7 @@ check('形态页直接选中小葵及新增花色，切换花色与工厂链接�
     }
     buttons[F.recipes.findIndex(recipe => recipe.kind === 'bicolor') + 1].listeners.click();
     assert.equal(elements['factory-link'].href, 'index.html?cat=bicolor');
-    assert.equal(elements['character-reference'].href, '圆头造型参考.png');
+    assert.equal(elements['character-reference'].href, '美术审核/分镜与造型/圆头造型参考.png');
     assert.equal(elements['art-comparison'].href, 'review/逐只比对.html');
     assert.equal(elements.cats.attributes['aria-label'], '蓝白站立和行走对照');
     elements.pause.listeners.click({ target: elements.pause });
@@ -1057,7 +1057,7 @@ check('形态页直接选中小葵及新增花色，切换花色与工厂链接�
     document: { getElementById: id => comparisonElements[id], createElement: element,
       querySelectorAll: () => comparisonElements.choices.children },
     CatArt: { draw: (_ctx, state) => compared.push(state) } };
-  const comparisonSource = fs.readFileSync(path.join(__dirname, 'review/逐只比对.html'), 'utf8').match(/<script>([\s\S]*?)<\/script>/)[1];
+  const comparisonSource = fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'review/逐只比对.html'), 'utf8').match(/<script>([\s\S]*?)<\/script>/)[1];
   vm.createContext(comparisonApp); vm.runInContext(comparisonSource, comparisonApp);
   const sampleKinds = ['bicolor', 'bicolor', 'solid', 'tabby', 'points', 'gold', 'silver'];
   assert.equal(comparisonElements.choices.children.length, sampleKinds.length);
@@ -1083,7 +1083,7 @@ check('小葵只保留走路与怒叫，表情循环暂停有效，旧炸毛入�
       document: { getElementById: id => elements[id], createElement: element, addEventListener() {}, hidden: false },
       CatArt: { draw: (_ctx, state) => rendered.push(state) }, requestAnimationFrame: fn => { nextFrame = fn; } };
     vm.createContext(app);
-    vm.runInContext(fs.readFileSync(path.join(__dirname, 'cat-review.js'), 'utf8'), app);
+    vm.runInContext(fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'cat-review.js'), 'utf8'), app);
     const frame = time => { now = time; rendered.length = 0; nextFrame(now); };
     assert.equal(elements.actions.hidden, false);
     assert.equal(elements.actions.children.length, 2);

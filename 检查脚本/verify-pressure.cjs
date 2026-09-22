@@ -3,10 +3,10 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const F = require('./timeline.js');
+const F = require('../timeline.js');
 
 // Exercise the actual gauge drawing with a small canvas substitute, without a browser.
-const source = fs.readFileSync(path.join(__dirname, 'scene.js'), 'utf8');
+const source = fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'scene.js'), 'utf8');
 const machineSource = source.slice(source.indexOf('function machine(s) {'), source.indexOf('function dripTray() {'));
 const lines = [], ovals = [], alphaStack = [];
 const ctx = {

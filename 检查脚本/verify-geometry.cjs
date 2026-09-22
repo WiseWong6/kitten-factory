@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
-const Cat = require('./cat.js');
-const F = require('./timeline.js');
+const Cat = require('../cat.js');
+const F = require('../timeline.js');
 
 // Evaluate the actual curves, not mock drawing calls. Nonzero fill uses the sum
 // of contour windings: the original opposing leg contours produced zero here.

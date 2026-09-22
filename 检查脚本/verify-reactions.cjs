@@ -4,8 +4,8 @@
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { isDeepStrictEqual } = require('node:util');
-const Cat = require('./cat.js');
-const F = require('./timeline.js');
+const Cat = require('../cat.js');
+const F = require('../timeline.js');
 const Before = process.argv[2] ? require(path.resolve(process.argv[2])) : null;
 const recipe = F.recipes.find(item => item.kind === 'xiaokui');
 assert.ok(recipe, '小葵配方须存在');

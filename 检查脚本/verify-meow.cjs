@@ -4,9 +4,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const F = require('./timeline.js');
-const Cat = require('./cat.js');
-const Sound = require('./sound.js');
+const F = require('../timeline.js');
+const Cat = require('../cat.js');
+const Sound = require('../sound.js');
 const ordinary = F.recipes.map((recipe, index) => ({ recipe, index })).filter(({ recipe }) => recipe.kind !== 'xiaokui');
 assert.equal(ordinary.length, 14);
 
@@ -126,7 +126,7 @@ for (const age of [0, 5.24, 5.36, 5.4, 5.45, 5.59, 5.72, 5.76, 5.8, 6.1, 6.44]) 
 
 // Run the real portrait and review-state constructors, without a browser.
 const sceneSandbox = { CatArt: Cat, F, Map, Math, Path2D: SamplePath };
-const sceneSource = fs.readFileSync(path.join(__dirname, 'scene.js'), 'utf8');
+const sceneSource = fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'scene.js'), 'utf8');
 const portraitSource = sceneSource.slice(sceneSource.indexOf('const PUCK_PORTRAITS ='), sceneSource.indexOf('\nfunction ', sceneSource.indexOf('function puckPortrait(') + 1));
 assert.ok(portraitSource.includes('function puckPortrait('));
 vm.createContext(sceneSandbox);
@@ -136,7 +136,7 @@ for (const { recipe } of ordinary) {
   const portrait = vm.runInContext('puckPortrait(recipe)', sceneSandbox);
   assert.ok(!portrait.state.reaction?.meow, '真实粉饼状态必须保持闭嘴');
 }
-const reviewSource = fs.readFileSync(path.join(__dirname, 'cat-review.js'), 'utf8');
+const reviewSource = fs.readFileSync(path.join(require('node:path').resolve(__dirname, '..'), 'cat-review.js'), 'utf8');
 assert.ok(!/catState\s*\(|meow\s*:/.test(reviewSource), '审核页日常姿态不接入出厂叫声时间线');
 console.log(`通过：14 种普通猫，${timingChecks} 个时间点、${drawingChecks} 组实际绘制与闭嘴回归。`);
 console.log('通过：猫叫时段、白猫轻叫口型、平滑张合、嘴部以外绘制不变、小葵怒叫隔离、粉饼及审核页闭嘴。');

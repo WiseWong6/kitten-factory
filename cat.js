@@ -70,7 +70,7 @@
   ].map(local);
   const ROOTS = [[306, 289], [367, 296], [486, 286], [559, 279]].map(p => localPoint(...p));
   const FEET = [[291, 373], [377, 372], [491, 374], [562, 372]].map(p => localPoint(...p));
-  // Xiaokui is traced from 小葵形象设定-v10.png. Keep the approved head/body
+  // Xiaokui is traced from 美术审核/小葵设定/小葵形象设定-v10.png. Keep the approved head/body
   // proportions and asymmetric markings instead of reshaping the white model.
   const xiaokuiPoint = (x, y) => [(x - 500) * 0.22, (y - 880) * 0.22];
   const xiaokuiPath = commands => mapCommands(commands, xiaokuiPoint);
