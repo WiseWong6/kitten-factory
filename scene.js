@@ -515,5 +515,5 @@ function secondaryMist(s) {
 }
 
 function drawCat(state, time) {
-  CatArt.draw(ctx, state, time);
+  CatArt.draw(ctx, state, time, { scale: 0.93 * (state.recipe.kind === 'xiaokui' ? 1.1 : 1) });
 }
